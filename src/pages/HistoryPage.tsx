@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Clock, Download, Trash2, Home, History, CheckSquare, Square, File, Image } from 'lucide-react';
+import { FileText, Clock, Download, Trash2, Home, History, CheckSquare, Square, File, Image, AlertTriangle, X } from 'lucide-react';
 import JSZip from 'jszip';
 
 // 新的文件记录接口
@@ -27,6 +27,9 @@ export default function HistoryPage() {
   const [showLast24Hours, setShowLast24Hours] = useState(true);
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [deleteAction, setDeleteAction] = useState<'selected' | 'clear'>('selected');
 
   // 从localStorage加载历史记录并转换格式
   useEffect(() => {
@@ -97,40 +100,41 @@ export default function HistoryPage() {
   // 删除选中的文件记录
   const deleteSelectedFiles = () => {
     if (selectedFiles.size === 0) return;
-    
-    const confirmMessage = `确定要删除选中的 ${selectedFiles.size} 个文件记录吗？此操作不可撤销。`;
-    
-    if (window.confirm(confirmMessage)) {
-      const updatedRecords = fileRecords.filter(record => !selectedFiles.has(record.id));
-      setFileRecords(updatedRecords);
-      setSelectedFiles(new Set());
-      
-      // 重新构建旧格式数据保存到localStorage
-      updateLocalStorage(updatedRecords);
-    }
+    setDeleteAction('selected');
+    setShowDeleteConfirm(true);
+  };
+
+  // 确认删除选中文件
+  const confirmDeleteSelected = () => {
+    const updatedRecords = fileRecords.filter(record => !selectedFiles.has(record.id));
+    setFileRecords(updatedRecords);
+    setSelectedFiles(new Set());
+    updateLocalStorage(updatedRecords);
+    setShowDeleteConfirm(false);
   };
 
   // 清空所有历史记录
   const clearAllHistory = () => {
-    const confirmMessage = showLast24Hours 
-      ? '确定要清空24小时内的所有历史记录吗？此操作不可撤销。'
-      : '确定要清空所有历史记录吗？此操作不可撤销。';
-    
-    if (window.confirm(confirmMessage)) {
-      if (showLast24Hours) {
-        // 只删除24小时内的记录
-        const now = Date.now();
-        const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
-        const remainingRecords = fileRecords.filter(record => record.timestamp < twentyFourHoursAgo);
-        setFileRecords(remainingRecords);
-        updateLocalStorage(remainingRecords);
-      } else {
-        // 清空所有记录
-        setFileRecords([]);
-        localStorage.removeItem('intellirename_history');
-      }
-      setSelectedFiles(new Set());
+    setDeleteAction('clear');
+    setShowClearConfirm(true);
+  };
+
+  // 确认清空历史记录
+  const confirmClearHistory = () => {
+    if (showLast24Hours) {
+      // 只删除24小时内的记录
+      const now = Date.now();
+      const twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
+      const remainingRecords = fileRecords.filter(record => record.timestamp < twentyFourHoursAgo);
+      setFileRecords(remainingRecords);
+      updateLocalStorage(remainingRecords);
+    } else {
+      // 清空所有记录
+      setFileRecords([]);
+      localStorage.removeItem('intellirename_history');
     }
+    setSelectedFiles(new Set());
+    setShowClearConfirm(false);
   };
 
   // 更新localStorage（转换回旧格式）
@@ -171,7 +175,7 @@ export default function HistoryPage() {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
     
-    return `ir智能命名更新${year}${month}${day}_${hours}${minutes}${seconds}.${extension}`;
+    return `irAiRename${year}${month}${day}_${hours}${minutes}${seconds}.${extension}`;
   };
 
   // 下载选中的文件名映射表
@@ -248,6 +252,80 @@ export default function HistoryPage() {
     });
   };
 
+  // 确认删除弹窗组件
+  const DeleteConfirmModal = ({ show, onClose, onConfirm, type }: {
+    show: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    type: 'selected' | 'clear';
+  }) => {
+    if (!show) return null;
+
+    const getTitle = () => {
+      if (type === 'selected') {
+        return `删除选中的 ${selectedFiles.size} 个文件记录`;
+      }
+      return showLast24Hours ? '清空24小时记录' : '清空所有记录';
+    };
+
+    const getMessage = () => {
+      if (type === 'selected') {
+        return `您即将删除选中的 ${selectedFiles.size} 个文件记录。`;
+      }
+      return showLast24Hours 
+        ? '您即将清空24小时内的所有历史记录。'
+        : '您即将清空所有历史记录。';
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+          <div className="p-6">
+            <div className="flex items-center mb-4">
+              <div className="flex-shrink-0">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <div className="ml-3">
+                <h3 className="text-lg font-medium text-gray-900">
+                  {getTitle()}
+                </h3>
+              </div>
+            </div>
+            
+            <div className="mb-4">
+              <p className="text-sm text-gray-700 mb-3">
+                {getMessage()}
+              </p>
+              <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                <p className="text-sm text-red-800 font-medium">
+                  ⚠️ 重要提醒：
+                </p>
+                <p className="text-sm text-red-700 mt-1">
+                  一旦删除无法恢复，数据超24小时不留存
+                </p>
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+              >
+                取消
+              </button>
+              <button
+                onClick={onConfirm}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+              >
+                确认删除
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       {/* 头部导航 */}
@@ -256,7 +334,10 @@ export default function HistoryPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <FileText className="h-8 w-8 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">IntelliRename</h1>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">AiRename</h1>
+                <h2 className="text-lg font-medium text-gray-600">智能重命名助手</h2>
+              </div>
             </div>
             <nav className="flex items-center space-x-6">
               <Link 
@@ -440,6 +521,21 @@ export default function HistoryPage() {
           )}
         </div>
       </main>
+
+      {/* 删除确认弹窗 */}
+      <DeleteConfirmModal
+        show={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={confirmDeleteSelected}
+        type="selected"
+      />
+      
+      <DeleteConfirmModal
+        show={showClearConfirm}
+        onClose={() => setShowClearConfirm(false)}
+        onConfirm={confirmClearHistory}
+        type="clear"
+      />
     </div>
   );
 }

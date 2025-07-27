@@ -429,7 +429,7 @@ const ProcessPage: React.FC = () => {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
     
-    return `ir智能命名更新${year}${month}${day}_${hours}${minutes}${seconds}.${extension}`;
+    return `irAiRename${year}${month}${day}_${hours}${minutes}${seconds}.${extension}`;
   };
 
   // 生成ZIP文件（只包含选中的文件）
@@ -480,7 +480,10 @@ const ProcessPage: React.FC = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <FileText className="h-8 w-8 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">IntelliRename</h1>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">AiRename</h1>
+                <h2 className="text-lg font-medium text-gray-600">智能重命名助手</h2>
+              </div>
             </div>
             <nav className="flex items-center space-x-6">
               <Link 
@@ -505,7 +508,7 @@ const ProcessPage: React.FC = () => {
       <div className="max-w-6xl mx-auto p-6">
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">文档智能命名</h1>
+            <h1 className="text-4xl font-bold text-gray-800 mb-4">AiRename - 文档智能命名</h1>
             <p className="text-lg text-gray-600">使用AI技术为您的文档生成专业、有意义的文件名</p>
           </div>
 

@@ -360,10 +360,13 @@ ${content.substring(0, 3000)}
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <FileText className="h-8 w-8 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">IntelliRename</h1>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">AiRename</h1>
+                <h2 className="text-lg font-medium text-gray-600">智能重命名助手</h2>
+              </div>
             </div>
             <div className="text-sm text-gray-500">
-              智能文档重命名工具
+              让每个文件都有意义的名字 - AI驱动的智能文档命名系统
             </div>
           </div>
         </div>

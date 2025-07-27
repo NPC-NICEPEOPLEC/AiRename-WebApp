@@ -122,7 +122,10 @@ export default function UploadPage() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <FileText className="h-8 w-8 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-900">IntelliRename</h1>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">AiRename</h1>
+                <h2 className="text-lg font-medium text-gray-600">智能重命名助手</h2>
+              </div>
             </div>
             <nav className="flex items-center space-x-6">
               <Link 
