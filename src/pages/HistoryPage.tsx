@@ -230,15 +230,15 @@ export default function HistoryPage() {
   };
 
   // 获取文件图标
-  const getFileIcon = (filename: string) => {
+  const getFileIcon = (filename: string, colorClass: string = '') => {
     const extension = filename.split('.').pop()?.toLowerCase();
     if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(extension || '')) {
-      return <Image className="w-4 h-4 text-blue-500" />;
+      return <Image className={`w-4 h-4 ${colorClass || 'text-blue-500'}`} />;
     }
     if (['txt', 'md', 'doc', 'docx', 'pdf'].includes(extension || '')) {
-      return <FileText className="w-4 h-4 text-green-500" />;
+      return <FileText className={`w-4 h-4 ${colorClass || 'text-green-500'}`} />;
     }
-    return <File className="w-4 h-4 text-gray-500" />;
+    return <File className={`w-4 h-4 ${colorClass || 'text-gray-500'}`} />;
   };
 
   // 格式化时间
@@ -278,44 +278,57 @@ export default function HistoryPage() {
     };
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div className="fixed inset-0 flex items-center justify-center z-50" style={{background: 'rgba(0, 0, 0, 0.6)'}}>
+        <div className="mondrian-card max-w-md w-full mx-4 relative" style={{
+          background: 'var(--mondrian-white)',
+          border: '3px solid var(--mondrian-red)',
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+        }}>
+          {/* 装饰性元素 */}
+          <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full" style={{background: 'var(--mondrian-yellow)'}}></div>
+          <div className="absolute -bottom-2 -left-2 w-4 h-4 rounded-full" style={{background: 'var(--mondrian-blue)'}}></div>
+          
           <div className="p-6">
-            <div className="flex items-center mb-4">
-              <div className="flex-shrink-0">
-                <AlertTriangle className="h-6 w-6 text-red-600" />
+            <div className="flex items-center mb-6">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mr-4" style={{background: 'linear-gradient(135deg, var(--mondrian-red), rgba(255, 59, 48, 0.8))'}}>
+                <AlertTriangle className="h-6 w-6 text-white" />
               </div>
-              <div className="ml-3">
-                <h3 className="text-lg font-medium text-gray-900">
+              <div className="flex-1">
+                <h3 className="text-lg font-medium mb-1" style={{color: 'var(--mondrian-black)'}}>
                   {getTitle()}
                 </h3>
+                <div className="w-16 h-1 rounded-full" style={{background: 'var(--mondrian-red)'}}></div>
               </div>
             </div>
             
-            <div className="mb-4">
-              <p className="text-sm text-gray-700 mb-3">
-                {getMessage()}
-              </p>
-              <div className="bg-red-50 border border-red-200 rounded-md p-3">
-                <p className="text-sm text-red-800 font-medium">
-                  ⚠️ 重要提醒：
-                </p>
-                <p className="text-sm text-red-700 mt-1">
-                  一旦删除无法恢复，数据超24小时不留存
-                </p>
-              </div>
-            </div>
+            <div className="mb-6 p-4 rounded-lg" style={{background: 'rgba(255, 59, 48, 0.05)', border: '1px solid rgba(255, 59, 48, 0.2)'}}>
+               <p className="text-sm font-medium" style={{color: 'var(--apple-gray-700)'}}>
+                 {getMessage()}
+               </p>
+             </div>
             
             <div className="flex justify-end space-x-3">
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                className="apple-button px-6 py-3 text-sm font-medium rounded-lg transition-all hover:scale-105"
+                style={{background: 'var(--apple-gray-100)', color: 'var(--apple-gray-600)'}}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--apple-gray-200)';
+                  e.currentTarget.style.color = 'var(--apple-gray-700)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'var(--apple-gray-100)';
+                  e.currentTarget.style.color = 'var(--apple-gray-600)';
+                }}
               >
                 取消
               </button>
               <button
                 onClick={onConfirm}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                className="apple-button px-6 py-3 text-sm font-medium text-white rounded-lg transition-all hover:scale-105"
+                style={{background: 'var(--mondrian-red)'}}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--apple-red)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'var(--mondrian-red)'}
               >
                 确认删除
               </button>
@@ -327,29 +340,44 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+    <div className="min-h-screen" style={{background: 'linear-gradient(135deg, var(--mondrian-white) 0%, rgba(0, 122, 255, 0.03) 100%)'}}>
       {/* 头部导航 */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <FileText className="h-8 w-8 text-blue-600" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">AiRename</h1>
-                <h2 className="text-lg font-medium text-gray-600">智能重命名助手</h2>
+      <header className="mondrian-card" style={{background: 'var(--mondrian-white)', borderBottom: '3px solid var(--mondrian-blue)'}}>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex justify-between items-center h-24">
+            <div className="flex items-center space-x-6 mondrian-accent pl-6">
+              <div className="p-3 rounded-xl" style={{background: 'linear-gradient(135deg, var(--mondrian-blue), var(--mondrian-red)'}}>
+                <FileText className="h-8 w-8 text-white" />
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-2xl font-bold" style={{color: 'var(--mondrian-black)'}}>《AiRename - 智能重命名助手》</h1>
+                <p className="text-base font-medium" style={{color: 'var(--mondrian-blue)'}}>让每个文件都有意义的名字</p>
+              </div>
+              <div className="ml-4 text-sm" style={{color: 'var(--mondrian-red)'}}>
+                让每个文件都有意义的名字
               </div>
             </div>
             <nav className="flex items-center space-x-6">
               <Link 
                 to="/" 
-                className="flex items-center text-gray-600 hover:text-blue-600 transition-colors"
+                className="apple-button flex items-center px-4 py-2 rounded-lg transition-all"
+                style={{background: 'var(--apple-gray-100)', color: 'var(--apple-gray-600)'}}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'var(--mondrian-yellow)';
+                  e.currentTarget.style.color = 'var(--mondrian-black)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'var(--apple-gray-100)';
+                  e.currentTarget.style.color = 'var(--apple-gray-600)';
+                }}
               >
                 <Home className="w-4 h-4 mr-1" />
                 首页
               </Link>
               <Link 
                 to="/history" 
-                className="flex items-center text-blue-600 font-medium"
+                className="apple-button flex items-center px-4 py-2 rounded-lg font-medium"
+                style={{background: 'var(--mondrian-red)', color: 'white'}}
               >
                 <History className="w-4 h-4 mr-1" />
                 历史记录
@@ -361,26 +389,32 @@ export default function HistoryPage() {
 
       {/* 主要内容 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="px-6 py-4 border-b border-gray-200">
+        <div className="mondrian-card" style={{background: 'var(--mondrian-white)'}}>
+          <div className="px-6 py-4" style={{borderBottom: '2px solid var(--mondrian-blue)'}}>
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h2 className="text-lg font-medium text-gray-900">处理历史记录</h2>
-                <p className="text-sm text-gray-500 mt-1">查看您之前处理过的文件记录，可选择文件进行操作</p>
+                <div className="flex items-center mb-2">
+                  <div className="w-4 h-4 mr-3" style={{background: 'var(--mondrian-red)'}}></div>
+                  <h2 className="text-lg font-medium" style={{color: 'var(--mondrian-black)'}}>处理历史记录</h2>
+                  <div className="flex-1 h-px ml-4" style={{background: 'linear-gradient(to right, var(--mondrian-blue), transparent)'}}></div>
+                </div>
+                <p className="text-sm mt-1" style={{color: 'var(--apple-gray-600)'}}>查看您之前处理过的文件记录，可选择文件进行操作</p>
               </div>
               <div className="flex items-center space-x-3">
                 {selectedFiles.size > 0 && (
                   <>
                     <button
                       onClick={downloadSelectedFiles}
-                      className="flex items-center px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                      className="apple-button flex items-center px-4 py-2 text-sm rounded-lg transition-all"
+                      style={{background: 'var(--mondrian-blue)', color: 'white'}}
                     >
                       <Download className="w-4 h-4 mr-1" />
                       下载选中 ({selectedFiles.size})
                     </button>
                     <button
                       onClick={deleteSelectedFiles}
-                      className="flex items-center px-3 py-1 text-sm bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                      className="apple-button flex items-center px-4 py-2 text-sm rounded-lg transition-all"
+                      style={{background: 'var(--mondrian-red)', color: 'white'}}
                     >
                       <Trash2 className="w-4 h-4 mr-1" />
                       删除选中
@@ -390,7 +424,10 @@ export default function HistoryPage() {
                 {filteredRecords.length > 0 && (
                   <button
                     onClick={clearAllHistory}
-                    className="text-red-600 hover:text-red-700 text-sm font-medium"
+                    className="text-sm font-medium transition-all hover:scale-105"
+                    style={{color: 'var(--mondrian-red)'}}
+                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--apple-red)'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--mondrian-red)'}
                   >
                     {showLast24Hours ? '清空24小时记录' : '清空所有记录'}
                   </button>
@@ -403,25 +440,26 @@ export default function HistoryPage() {
               <div className="flex items-center space-x-4">
                 <button
                   onClick={() => setShowLast24Hours(true)}
-                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                    showLast24Hours 
-                      ? 'bg-blue-100 text-blue-700 font-medium' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                  className="apple-button px-4 py-2 text-sm rounded-lg transition-all"
+                  style={{
+                    background: showLast24Hours ? 'var(--mondrian-blue)' : 'var(--apple-gray-100)',
+                    color: showLast24Hours ? 'white' : 'var(--apple-gray-600)'
+                  }}
                 >
                   最近24小时
                 </button>
                 <button
                   onClick={() => setShowLast24Hours(false)}
-                  className={`px-3 py-1 text-sm rounded-md transition-colors ${
-                    !showLast24Hours 
-                      ? 'bg-blue-100 text-blue-700 font-medium' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
+                  className="apple-button px-4 py-2 text-sm rounded-lg transition-all"
+                  style={{
+                    background: !showLast24Hours ? 'var(--mondrian-blue)' : 'var(--apple-gray-100)',
+                    color: !showLast24Hours ? 'white' : 'var(--apple-gray-600)'
+                  }}
                 >
                   全部记录
                 </button>
-                <span className="text-sm text-gray-500">
+                <div className="w-px h-6" style={{background: 'var(--mondrian-blue)'}}></div>
+                <span className="text-sm font-medium" style={{color: 'var(--apple-gray-600)'}}>
                   共 {filteredRecords.length} 条记录
                 </span>
               </div>
@@ -429,7 +467,10 @@ export default function HistoryPage() {
               {filteredRecords.length > 0 && (
                 <button
                   onClick={handleSelectAll}
-                  className="flex items-center text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                  className="flex items-center text-sm transition-all hover:scale-105"
+                  style={{color: 'var(--mondrian-blue)'}}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--mondrian-red)'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--mondrian-blue)'}
                 >
                   {selectAll ? (
                     <CheckSquare className="w-4 h-4 mr-1" />
@@ -444,11 +485,17 @@ export default function HistoryPage() {
 
           {filteredRecords.length === 0 ? (
             <div className="px-6 py-12 text-center">
-              <Clock className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <div className="relative mb-6">
+                <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, var(--mondrian-blue), var(--apple-blue)'}}>
+                  <Clock className="h-10 w-10 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full" style={{background: 'var(--mondrian-red)'}}></div>
+                <div className="absolute -bottom-2 -left-2 w-4 h-4 rounded-full" style={{background: 'var(--mondrian-yellow)'}}></div>
+              </div>
+              <h3 className="text-lg font-medium mb-2" style={{color: 'var(--mondrian-black)'}}>
                 {showLast24Hours ? '24小时内暂无历史记录' : '暂无历史记录'}
               </h3>
-              <p className="text-gray-500 mb-6">
+              <p className="mb-6" style={{color: 'var(--apple-gray-600)'}}>
                 {showLast24Hours 
                   ? '您在过去24小时内还没有处理过任何文件' 
                   : '您还没有处理过任何文件'
@@ -456,52 +503,65 @@ export default function HistoryPage() {
               </p>
               <Link
                 to="/"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+                className="apple-button inline-flex items-center px-6 py-3 text-sm font-medium rounded-lg transition-all"
+                style={{background: 'var(--mondrian-blue)', color: 'white'}}
               >
                 开始上传文件
               </Link>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200">
+            <div className="space-y-2 p-4">
               {filteredRecords.map((record) => (
-                <div key={record.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                <div key={record.id} className="mondrian-card p-4 transition-all hover:scale-[1.01]" style={{
+                  background: selectedFiles.has(record.id) ? 'linear-gradient(135deg, rgba(255, 59, 48, 0.1), rgba(255, 59, 48, 0.05))' : 'var(--mondrian-white)',
+                  border: selectedFiles.has(record.id) ? '2px solid var(--mondrian-red)' : '1px solid var(--apple-gray-200)'
+                }}>
                   <div className="flex items-center space-x-4">
                     {/* 复选框 */}
                     <button
                       onClick={() => handleFileSelect(record.id)}
-                      className="flex-shrink-0 text-blue-600 hover:text-blue-700 transition-colors"
+                      className="flex-shrink-0 p-2 rounded-lg transition-all hover:scale-110"
+                      style={{background: selectedFiles.has(record.id) ? 'var(--mondrian-red)' : 'var(--apple-gray-100)'}}
                     >
                       {selectedFiles.has(record.id) ? (
-                        <CheckSquare className="w-5 h-5" />
+                        <CheckSquare className="w-4 h-4 text-white" />
                       ) : (
-                        <Square className="w-5 h-5" />
+                        <Square className="w-4 h-4" style={{color: 'var(--apple-gray-400)'}} />
                       )}
                     </button>
                     
                     {/* 文件图标 */}
-                    <div className="flex-shrink-0">
-                      {getFileIcon(record.originalName)}
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{background: 'linear-gradient(135deg, var(--mondrian-blue), var(--apple-blue)'}}>
+                      {getFileIcon(record.originalName, 'text-white')}
                     </div>
                     
                     {/* 文件信息 */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <Clock className="w-3 h-3 text-gray-400" />
-                        <span className="text-xs text-gray-500">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <div className="w-6 h-6 rounded-full flex items-center justify-center" style={{background: 'var(--mondrian-yellow)'}}>
+                          <Clock className="w-3 h-3" style={{color: 'var(--mondrian-black)'}} />
+                        </div>
+                        <span className="text-xs font-medium" style={{color: 'var(--apple-gray-600)'}}>
                           {formatTime(record.timestamp)}
                         </span>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">原文件名</p>
-                          <p className="text-sm text-gray-900 truncate" title={record.originalName}>
+                          <div className="flex items-center mb-1">
+                            <div className="w-2 h-2 rounded-full mr-2" style={{background: 'var(--mondrian-blue)'}}></div>
+                            <p className="text-xs font-medium" style={{color: 'var(--apple-gray-600)'}}>原文件名</p>
+                          </div>
+                          <p className="text-sm font-medium truncate" title={record.originalName} style={{color: 'var(--mondrian-black)'}}>
                             {record.originalName}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-500 mb-1">新文件名</p>
-                          <p className="text-sm font-medium text-gray-900 truncate" title={record.newName}>
+                          <div className="flex items-center mb-1">
+                            <div className="w-2 h-2 rounded-full mr-2" style={{background: 'var(--mondrian-red)'}}></div>
+                            <p className="text-xs font-medium" style={{color: 'var(--apple-gray-600)'}}>新文件名</p>
+                          </div>
+                          <p className="text-sm font-medium truncate" title={record.newName} style={{color: 'var(--mondrian-red)'}}>
                             {record.newName}
                           </p>
                         </div>
@@ -510,7 +570,10 @@ export default function HistoryPage() {
                     
                     {/* 文件扩展名标签 */}
                     <div className="flex-shrink-0">
-                      <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800">
+                      <span className="inline-flex items-center px-3 py-1 rounded-lg text-xs font-medium" style={{
+                        background: 'var(--mondrian-yellow)',
+                        color: 'var(--mondrian-black)'
+                      }}>
                         .{record.fileExtension}
                       </span>
                     </div>

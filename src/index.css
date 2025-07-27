@@ -4,11 +4,122 @@
 
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-  line-height: 1.5;
+  line-height: 1.6;
   font-weight: 400;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  /* 蒙德里安风格色彩变量 */
+  --mondrian-red: #E53E3E;
+  --mondrian-blue: #3182CE;
+  --mondrian-yellow: #D69E2E;
+  --mondrian-black: #1A202C;
+  --mondrian-white: #FFFFFF;
+  --mondrian-gray: #F7FAFC;
+  --mondrian-border: #E2E8F0;
+  
+  /* 苹果风格阴影 */
+  --apple-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --apple-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --apple-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* 全局样式优化 */
+body {
+  background: linear-gradient(135deg, var(--mondrian-white) 0%, var(--mondrian-gray) 100%);
+  color: var(--mondrian-black);
+  min-height: 100vh;
+}
+
+/* 蒙德里安风格几何装饰 */
+.mondrian-accent {
+  position: relative;
+}
+
+.mondrian-accent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--mondrian-red) 0%, var(--mondrian-blue) 50%, var(--mondrian-yellow) 100%);
+  border-radius: 2px;
+}
+
+/* 苹果风格按钮 */
+.apple-button {
+  background: var(--mondrian-white);
+  border: 1px solid var(--mondrian-border);
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: var(--apple-shadow-sm);
+}
+
+.apple-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--apple-shadow-md);
+}
+
+.apple-button:active {
+  transform: translateY(0);
+  box-shadow: var(--apple-shadow-sm);
+}
+
+/* 蒙德里安风格卡片 */
+.mondrian-card {
+  background: var(--mondrian-white);
+  border: 2px solid var(--mondrian-border);
+  border-radius: 12px;
+  box-shadow: var(--apple-shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.mondrian-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(to right, var(--mondrian-red) 0%, var(--mondrian-blue) 50%, var(--mondrian-yellow) 100%);
+}
+
+/* 优化滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--mondrian-gray);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--mondrian-border);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--mondrian-blue);
+}
+
+/* 文字选择优化 */
+::selection {
+  background: var(--mondrian-blue);
+  color: var(--mondrian-white);
+}
+
+/* 焦点状态优化 */
+*:focus {
+  outline: 2px solid var(--mondrian-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

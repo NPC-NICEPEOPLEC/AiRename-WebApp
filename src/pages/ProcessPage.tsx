@@ -461,43 +461,47 @@ const ProcessPage: React.FC = () => {
   };
 
   // 获取文件图标
-  const getFileIcon = (filename: string) => {
+  const getFileIcon = (filename: string, colorClass: string = '') => {
     const extension = filename.split('.').pop()?.toLowerCase();
     if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(extension || '')) {
-      return <Image className="w-5 h-5 text-blue-500" />;
+      return <Image className={`w-5 h-5 ${colorClass || 'text-blue-500'}`} />;
     }
     if (['txt', 'md', 'doc', 'docx', 'pdf'].includes(extension || '')) {
-      return <FileText className="w-5 h-5 text-green-500" />;
+      return <FileText className={`w-5 h-5 ${colorClass || 'text-green-500'}`} />;
     }
-    return <File className="w-5 h-5 text-gray-500" />;
+    return <File className={`w-5 h-5 ${colorClass || 'text-gray-500'}`} />;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* 头部导航 */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <FileText className="h-8 w-8 text-blue-600" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">AiRename</h1>
-                <h2 className="text-lg font-medium text-gray-600">智能重命名助手</h2>
+    <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, var(--mondrian-white) 0%, var(--mondrian-gray) 100%)' }}>
+      {/* 头部导航 - 蒙德里安风格 */}
+      <header className="mondrian-card border-0 rounded-none shadow-lg">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex justify-between items-center h-24">
+            <div className="flex items-center space-x-6 mondrian-accent pl-6">
+              <div className="p-3 rounded-xl" style={{ background: 'linear-gradient(135deg, var(--mondrian-blue), var(--mondrian-red))' }}>
+                <FileText className="h-8 w-8 text-white" />
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-2xl font-bold" style={{ color: 'var(--mondrian-black)' }}>《AiRename - 智能重命名助手》</h1>
+                <p className="text-base font-medium" style={{ color: 'var(--mondrian-blue)' }}>让每个文件都有意义的名字</p>
               </div>
             </div>
-            <nav className="flex items-center space-x-6">
+            <nav className="flex items-center space-x-4">
               <Link 
                 to="/" 
-                className="flex items-center text-gray-600 hover:text-blue-600 transition-colors"
+                className="apple-button flex items-center font-medium transition-all duration-200 hover:bg-gray-50"
+                style={{ color: 'var(--mondrian-black)' }}
               >
-                <Home className="w-4 h-4 mr-1" />
+                <Home className="w-5 h-5 mr-2" />
                 首页
               </Link>
               <Link 
                 to="/history" 
-                className="flex items-center text-gray-600 hover:text-blue-600 transition-colors"
+                className="apple-button flex items-center font-medium transition-all duration-200"
+                style={{ color: 'var(--mondrian-blue)', borderColor: 'var(--mondrian-blue)' }}
               >
-                <History className="w-4 h-4 mr-1" />
+                <History className="w-5 h-5 mr-2" />
                 历史记录
               </Link>
             </nav>
@@ -506,24 +510,25 @@ const ProcessPage: React.FC = () => {
       </header>
 
       <div className="max-w-6xl mx-auto p-6">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="mondrian-card p-8" style={{background: 'var(--mondrian-white)'}}>
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">AiRename - 文档智能命名</h1>
-            <p className="text-lg text-gray-600">使用AI技术为您的文档生成专业、有意义的文件名</p>
+            <div className="mondrian-accent mb-4" style={{width: '60px', height: '4px', background: 'var(--mondrian-blue)', margin: '0 auto'}}></div>
+            <h1 className="text-4xl font-bold mb-4" style={{color: 'var(--mondrian-black)'}}>AiRename - 文档智能命名</h1>
+            <p className="text-lg" style={{color: 'var(--apple-gray-600)'}}>使用AI技术为您的文档生成专业、有意义的文件名</p>
           </div>
 
           {/* API配置状态 */}
           {!isApiConfigured() && (
-            <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="mb-6 p-4 rounded-lg" style={{background: 'var(--mondrian-yellow)', border: '2px solid var(--mondrian-red)'}}>
               <div className="flex items-start">
-                <AlertCircle className="w-5 h-5 text-yellow-600 mr-3 mt-0.5 flex-shrink-0" />
-                <div className="text-yellow-800">
+                <AlertCircle className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" style={{color: 'var(--mondrian-red)'}} />
+                <div style={{color: 'var(--mondrian-black)'}}>
                   <p className="font-medium mb-2">⚠️ 需要配置DeepSeek API密钥</p>
                   <p className="text-sm mb-2">请在.env文件中设置有效的VITE_DEEPSEEK_API_KEY。</p>
                   <div className="text-sm space-y-1">
                     <p><strong>获取方式：</strong></p>
-                    <p>• 官方平台：<a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">platform.deepseek.com/api_keys</a> (注意：已暂停新用户赠款)</p>
-                    <p>• 第三方平台：<a href="https://api.siliconflow.cn" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">SiliconFlow</a> (可能提供免费额度)</p>
+                    <p>• 官方平台：<a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{color: 'var(--mondrian-blue)'}}>platform.deepseek.com/api_keys</a> (注意：已暂停新用户赠款)</p>
+                    <p>• 第三方平台：<a href="https://api.siliconflow.cn" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{color: 'var(--mondrian-blue)'}}>SiliconFlow</a> (可能提供免费额度)</p>
                   </div>
                 </div>
               </div>
@@ -533,12 +538,30 @@ const ProcessPage: React.FC = () => {
           {/* 文件上传区域 */}
           <div className="mb-8">
             <div 
-              className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition-colors cursor-pointer"
+              className="border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer relative overflow-hidden"
+              style={{
+                borderColor: 'var(--mondrian-blue)',
+                background: 'linear-gradient(135deg, var(--mondrian-white) 0%, rgba(0, 122, 255, 0.02) 100%)'
+              }}
               onClick={() => fileInputRef.current?.click()}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--mondrian-red)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--mondrian-blue)';
+                e.currentTarget.style.transform = 'translateY(0)';
+              }}
             >
-              <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-lg text-gray-600 mb-2">点击上传文件或拖拽文件到此处</p>
-              <p className="text-sm text-gray-500">支持各种文档、图片和文本文件</p>
+              <div className="absolute top-4 left-4 w-3 h-3 rounded-full" style={{background: 'var(--mondrian-red)'}}></div>
+              <div className="absolute top-4 right-4 w-3 h-3 rounded-full" style={{background: 'var(--mondrian-yellow)'}}></div>
+              <div className="relative z-10">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, var(--mondrian-blue), var(--apple-blue))'}}>
+                  <Upload className="w-8 h-8 text-white" />
+                </div>
+                <p className="text-lg mb-2 font-medium" style={{color: 'var(--mondrian-black)'}}>点击上传文件或拖拽文件到此处</p>
+                <p className="text-sm" style={{color: 'var(--apple-gray-600)'}}>支持各种文档、图片和文本文件</p>
+              </div>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -553,11 +576,14 @@ const ProcessPage: React.FC = () => {
           {files.length > 0 && (
             <div className="mb-6">
               {/* 选择操作栏 */}
-              <div className="flex items-center justify-between mb-4 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between mb-4 p-4 mondrian-card" style={{background: 'linear-gradient(135deg, var(--mondrian-white) 0%, rgba(0, 122, 255, 0.02) 100%)'}}>
                 <div className="flex items-center space-x-4">
                   <button
                     onClick={handleSelectAll}
-                    className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                    className="flex items-center transition-all hover:scale-105"
+                    style={{color: 'var(--mondrian-blue)'}}
+                    onMouseEnter={(e) => e.currentTarget.style.color = 'var(--mondrian-red)'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = 'var(--mondrian-blue)'}
                   >
                     {selectAll ? (
                       <CheckSquare className="w-5 h-5 mr-2" />
@@ -566,7 +592,8 @@ const ProcessPage: React.FC = () => {
                     )}
                     全选
                   </button>
-                  <span className="text-sm text-gray-600">
+                  <div className="w-px h-6" style={{background: 'var(--mondrian-blue)'}}></div>
+                  <span className="text-sm font-medium" style={{color: 'var(--apple-gray-600)'}}>
                     已选择 {selectedFiles.size} / {files.length} 个文件
                   </span>
                 </div>
@@ -574,7 +601,11 @@ const ProcessPage: React.FC = () => {
                   <button
                     onClick={handleBatchProcess}
                     disabled={isProcessing || !isApiConfigured()}
-                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                    className="apple-button flex items-center px-6 py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      background: isProcessing || !isApiConfigured() ? 'var(--apple-gray-300)' : 'var(--mondrian-blue)',
+                      color: 'white'
+                    }}
                   >
                     <Play className="w-4 h-4 mr-2" />
                     {isProcessing ? '处理中...' : '一键处理'}
@@ -582,10 +613,14 @@ const ProcessPage: React.FC = () => {
                   <button
                     onClick={generateZip}
                     disabled={selectedFiles.size === 0}
-                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                    className="apple-button flex items-center px-6 py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      background: selectedFiles.size === 0 ? 'var(--apple-gray-300)' : 'var(--mondrian-red)',
+                      color: selectedFiles.size === 0 ? 'var(--mondrian-black)' : 'white'
+                    }}
                   >
-                    <Download className="w-4 h-4 mr-2" />
-                    下载选中文件 ({selectedFiles.size})
+                    <Download className="w-4 h-4 mr-2" style={{color: selectedFiles.size === 0 ? 'var(--mondrian-black)' : 'white'}} />
+                    {selectedFiles.size === 0 ? '下载选中文件' : `下载选中文件 (${selectedFiles.size})`}
                   </button>
                 </div>
               </div>
@@ -595,45 +630,67 @@ const ProcessPage: React.FC = () => {
           {/* 文件列表 */}
           {files.length > 0 && (
             <div className="space-y-4">
-              <h2 className="text-2xl font-semibold text-gray-800 mb-4">文件列表</h2>
+              <div className="flex items-center mb-6">
+                <div className="w-4 h-4 mr-3" style={{background: 'var(--mondrian-red)'}}></div>
+                <h2 className="text-2xl font-semibold" style={{color: 'var(--mondrian-black)'}}>文件列表</h2>
+                <div className="flex-1 h-px ml-4" style={{background: 'linear-gradient(to right, var(--mondrian-blue), transparent)'}}></div>
+              </div>
               {files.map((fileItem, index) => (
-                <div key={fileItem.id} className={`p-6 border rounded-xl transition-all ${
-                  currentProcessingIndex === index ? 'border-blue-400 bg-blue-50' : 
-                  selectedFiles.has(fileItem.id) ? 'border-green-400 bg-green-50' : 'border-gray-200 bg-gray-50'
-                }`}>
+                <div key={fileItem.id} className="mondrian-card p-6 transition-all hover:scale-[1.01]" style={{
+                  background: currentProcessingIndex === index ? 'linear-gradient(135deg, rgba(0, 122, 255, 0.1), rgba(0, 122, 255, 0.05))' : 
+                  selectedFiles.has(fileItem.id) ? 'linear-gradient(135deg, rgba(255, 59, 48, 0.1), rgba(255, 59, 48, 0.05))' : 'var(--mondrian-white)',
+                  border: currentProcessingIndex === index ? '2px solid var(--mondrian-blue)' : 
+                  selectedFiles.has(fileItem.id) ? '2px solid var(--mondrian-red)' : '1px solid var(--apple-gray-200)'
+                }}>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4 flex-1">
                       {/* 选择框 */}
                       <button
                         onClick={() => handleFileSelect(fileItem.id)}
-                        className="flex-shrink-0 p-1 hover:bg-gray-200 rounded transition-colors"
+                        className="flex-shrink-0 p-2 rounded-lg transition-all hover:scale-110"
+                        style={{background: selectedFiles.has(fileItem.id) ? 'var(--mondrian-red)' : 'var(--apple-gray-100)'}}
                       >
                         {selectedFiles.has(fileItem.id) ? (
-                          <CheckSquare className="w-5 h-5 text-green-600" />
+                          <CheckSquare className="w-5 h-5 text-white" />
                         ) : (
-                          <Square className="w-5 h-5 text-gray-400" />
+                          <Square className="w-5 h-5" style={{color: 'var(--apple-gray-400)'}} />
                         )}
                       </button>
-                      {getFileIcon(fileItem.originalName)}
+                      <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{background: 'linear-gradient(135deg, var(--mondrian-blue), var(--apple-blue)'}}>
+                        {getFileIcon(fileItem.originalName, 'text-white')}
+                      </div>
                       <div className="flex-1">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <p className="text-sm text-gray-500 mb-1">原文件名</p>
-                            <p className="font-medium text-gray-800">{fileItem.originalName}</p>
+                            <div className="flex items-center mb-1">
+                              <div className="w-2 h-2 rounded-full mr-2" style={{background: 'var(--mondrian-yellow)'}}></div>
+                              <p className="text-sm font-medium" style={{color: 'var(--apple-gray-600)'}}>原文件名</p>
+                            </div>
+                            <p className="font-medium" style={{color: 'var(--mondrian-black)'}}>{fileItem.originalName}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-500 mb-1">新文件名</p>
+                            <div className="flex items-center mb-1">
+                              <div className="w-2 h-2 rounded-full mr-2" style={{background: 'var(--mondrian-red)'}}></div>
+                              <p className="text-sm font-medium" style={{color: 'var(--apple-gray-600)'}}>新文件名</p>
+                            </div>
                             {fileItem.isEditing ? (
                               <div className="flex items-center space-x-2">
                                 <input
                                   type="text"
                                   defaultValue={fileItem.editedName}
-                                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  className="flex-1 px-4 py-2 rounded-lg transition-all focus:outline-none focus:scale-105"
+                                  style={{
+                                    border: '2px solid var(--mondrian-blue)',
+                                    background: 'var(--mondrian-white)',
+                                    color: 'var(--mondrian-black)'
+                                  }}
                                   onKeyPress={(e) => {
                                     if (e.key === 'Enter') {
                                       saveEdit(fileItem.id, (e.target as HTMLInputElement).value);
                                     }
                                   }}
+                                  onFocus={(e) => e.target.style.borderColor = 'var(--mondrian-red)'}
+                                  onBlur={(e) => e.target.style.borderColor = 'var(--mondrian-blue)'}
                                   autoFocus
                                 />
                                 <button
@@ -641,21 +698,23 @@ const ProcessPage: React.FC = () => {
                                     const input = e.currentTarget.previousElementSibling as HTMLInputElement;
                                     saveEdit(fileItem.id, input.value);
                                   }}
-                                  className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                                  className="apple-button px-4 py-2 rounded-lg transition-all"
+                                  style={{background: 'var(--mondrian-red)', color: 'white'}}
                                 >
                                   保存
                                 </button>
                                 <button
                                   onClick={() => cancelEdit(fileItem.id)}
-                                  className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                                  className="apple-button px-4 py-2 rounded-lg transition-all"
+                                  style={{background: 'var(--apple-gray-500)', color: 'white'}}
                                 >
                                   取消
                                 </button>
                               </div>
                             ) : (
-                              <p className={`font-medium ${
-                                fileItem.editedName !== fileItem.originalName ? 'text-green-600' : 'text-gray-800'
-                              }`}>
+                              <p className="font-medium" style={{
+                                color: fileItem.editedName !== fileItem.originalName ? 'var(--mondrian-red)' : 'var(--mondrian-black)'
+                              }}>
                                 {fileItem.editedName}
                               </p>
                             )}
@@ -665,24 +724,46 @@ const ProcessPage: React.FC = () => {
                     </div>
                     <div className="flex items-center space-x-2 ml-4">
                       {fileItem.isProcessing && (
-                        <Clock className="w-5 h-5 text-blue-500 animate-spin" />
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background: 'var(--mondrian-blue)'}}>
+                          <Clock className="w-4 h-4 text-white animate-spin" />
+                        </div>
                       )}
                       {fileItem.isProcessed && !fileItem.isProcessing && (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{background: 'var(--mondrian-red)'}}>
+                          <CheckCircle className="w-4 h-4 text-white" />
+                        </div>
                       )}
                       {!fileItem.isEditing && (
                         <button
                           onClick={() => startEditing(fileItem.id)}
-                          className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
+                          className="p-2 rounded-lg transition-all hover:scale-110"
+                          style={{background: 'var(--apple-gray-100)'}}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'var(--mondrian-yellow)';
+                            e.currentTarget.style.transform = 'scale(1.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'var(--apple-gray-100)';
+                            e.currentTarget.style.transform = 'scale(1)';
+                          }}
                         >
-                          <Edit2 className="w-5 h-5" />
+                          <Edit2 className="w-5 h-5" style={{color: 'var(--apple-gray-600)'}} />
                         </button>
                       )}
                       <button
                         onClick={() => removeFile(fileItem.id)}
-                        className="p-2 text-gray-600 hover:text-red-600 transition-colors"
+                        className="p-2 rounded-lg transition-all hover:scale-110"
+                        style={{background: 'var(--apple-gray-100)'}}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'var(--mondrian-red)';
+                          e.currentTarget.style.transform = 'scale(1.1)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'var(--apple-gray-100)';
+                          e.currentTarget.style.transform = 'scale(1)';
+                        }}
                       >
-                        <Trash2 className="w-5 h-5" />
+                        <Trash2 className="w-5 h-5" style={{color: 'var(--apple-gray-600)'}} />
                       </button>
                     </div>
                   </div>
@@ -693,9 +774,15 @@ const ProcessPage: React.FC = () => {
 
           {files.length === 0 && (
             <div className="text-center py-12">
-              <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-xl text-gray-500">还没有上传任何文件</p>
-              <p className="text-gray-400">上传文件开始智能重命名</p>
+              <div className="relative mb-6">
+                <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center" style={{background: 'linear-gradient(135deg, var(--mondrian-blue), var(--apple-blue))'}}>
+                  <FileText className="w-10 h-10 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full" style={{background: 'var(--mondrian-red)'}}></div>
+                <div className="absolute -bottom-2 -left-2 w-4 h-4 rounded-full" style={{background: 'var(--mondrian-yellow)'}}></div>
+              </div>
+              <p className="text-xl font-medium mb-2" style={{color: 'var(--mondrian-black)'}}>还没有上传任何文件</p>
+              <p style={{color: 'var(--apple-gray-600)'}}>上传文件开始智能重命名</p>
             </div>
           )}
         </div>

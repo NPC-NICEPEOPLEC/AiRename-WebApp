@@ -355,18 +355,20 @@ ${content.substring(0, 3000)}
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
       {/* 头部导航 */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <FileText className="h-8 w-8 text-blue-600" />
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">AiRename</h1>
-                <h2 className="text-lg font-medium text-gray-600">智能重命名助手</h2>
+      <header className="mondrian-card border-0 rounded-none shadow-lg">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex justify-between items-center h-24">
+            <div className="flex items-center space-x-6 mondrian-accent pl-6">
+              <div className="p-3 rounded-xl" style={{ background: 'linear-gradient(135deg, var(--mondrian-blue), var(--mondrian-red))' }}>
+                <FileText className="h-8 w-8 text-white" />
+              </div>
+              <div className="space-y-1">
+                <h1 className="text-2xl font-bold" style={{ color: 'var(--mondrian-black)' }}>《AiRename - 智能重命名助手》</h1>
+                <p className="text-base font-medium" style={{ color: 'var(--mondrian-blue)' }}>让每个文件都有意义的名字</p>
               </div>
             </div>
-            <div className="text-sm text-gray-500">
-              让每个文件都有意义的名字 - AI驱动的智能文档命名系统
+            <div className="text-sm" style={{ color: 'var(--apple-gray-500)' }}>
+              AI驱动的智能文档命名系统
             </div>
           </div>
         </div>
