@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { Upload, Download, Edit2, Trash2, Play, FileText, Image, File, CheckCircle, Clock, AlertCircle, Home, History, CheckSquare, Square } from 'lucide-react';
+import { Upload, Download, Edit2, Trash2, Play, Pause, FileText, Image, File, CheckCircle, Clock, AlertCircle, Home, History, CheckSquare, Square } from 'lucide-react';
 import JSZip from 'jszip';
 
 interface FileItem {
@@ -18,10 +18,13 @@ const ProcessPage: React.FC = () => {
   const location = useLocation();
   const [files, setFiles] = useState<FileItem[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [currentProcessingIndex, setCurrentProcessingIndex] = useState(-1);
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [dragActive, setDragActive] = useState(false);
+  const shouldStopProcessing = useRef(false);
 
   // 从路由状态中获取文件数据
   useEffect(() => {
@@ -62,6 +65,41 @@ const ProcessPage: React.FC = () => {
       isProcessed: false
     }));
     setFiles(prev => [...prev, ...newFiles]);
+  };
+
+  // 拖拽处理
+  const handleDrag = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const uploadedFiles = Array.from(e.dataTransfer.files);
+      const newFiles: FileItem[] = uploadedFiles.map(file => ({
+        id: Math.random().toString(36).substr(2, 9),
+        file,
+        originalName: file.name,
+        newName: file.name,
+        editedName: file.name,
+        isEditing: false,
+        isProcessing: false,
+        isProcessed: false
+      }));
+      setFiles(prev => [...prev, ...newFiles]);
+      
+      // 拖拽上传的文件不自动开始处理，需要手动点击"一键处理"
+      // 移除自动处理逻辑
+    }
   };
 
   // 读取文件内容
@@ -292,26 +330,68 @@ const ProcessPage: React.FC = () => {
 
   // 一键处理所有文件
   const handleBatchProcess = async () => {
-    setIsProcessing(true);
-    setCurrentProcessingIndex(0);
+    if (isProcessing) {
+      // 如果正在处理，则暂停
+      shouldStopProcessing.current = true;
+      setIsPaused(true);
+      setIsProcessing(false);
+      return;
+    }
 
-    for (let i = 0; i < files.length; i++) {
+    // 重置停止标志
+    shouldStopProcessing.current = false;
+    
+    if (isPaused) {
+      // 如果已暂停，则继续处理
+      setIsPaused(false);
+    } else {
+      // 开始新的处理
+      setIsPaused(false);
+      setCurrentProcessingIndex(0);
+    }
+    
+    setIsProcessing(true);
+    const startIndex = isPaused ? currentProcessingIndex : 0;
+    
+    for (let i = startIndex; i < files.length; i++) {
+      // 检查是否被暂停
+      if (shouldStopProcessing.current) {
+        break;
+      }
+      
       if (!files[i].isProcessed) {
         setCurrentProcessingIndex(i);
         await processFile(files[i], i);
-        // 添加延迟避免API限制
-        if (i < files.length - 1) {
+        
+        // 在延迟期间也检查是否被暂停
+        if (i < files.length - 1 && !shouldStopProcessing.current) {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
     }
 
-    setIsProcessing(false);
-    setCurrentProcessingIndex(-1);
-    
-    // 处理完成后自动保存到历史记录
-    saveToHistory();
+    // 如果没有被暂停，说明处理完成
+    if (!shouldStopProcessing.current) {
+      setIsProcessing(false);
+      setIsPaused(false);
+      setCurrentProcessingIndex(-1);
+      
+      // 处理完成后自动保存到历史记录
+      saveToHistory();
+    }
   };
+
+  // 处理自动处理逻辑
+  useEffect(() => {
+    if (files.length > 0 && location.state?.autoProcess && isApiConfigured() && !isProcessing) {
+      // 延迟执行确保状态更新完成
+      const timer = setTimeout(() => {
+        handleBatchProcess();
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [files, location.state?.autoProcess, isProcessing]);
 
   // 编辑功能
   const startEditing = (id: string) => {
@@ -538,19 +618,31 @@ const ProcessPage: React.FC = () => {
           {/* 文件上传区域 */}
           <div className="mb-8">
             <div 
-              className="border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer relative overflow-hidden"
+              className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer relative overflow-hidden ${
+                dragActive ? 'border-red-500 bg-red-50' : ''
+              }`}
               style={{
-                borderColor: 'var(--mondrian-blue)',
-                background: 'linear-gradient(135deg, var(--mondrian-white) 0%, rgba(0, 122, 255, 0.02) 100%)'
+                borderColor: dragActive ? 'var(--mondrian-red)' : 'var(--mondrian-blue)',
+                background: dragActive 
+                  ? 'linear-gradient(135deg, rgba(255, 59, 48, 0.1), rgba(255, 59, 48, 0.05))' 
+                  : 'linear-gradient(135deg, var(--mondrian-white) 0%, rgba(0, 122, 255, 0.02) 100%)'
               }}
               onClick={() => fileInputRef.current?.click()}
+              onDragEnter={handleDrag}
+              onDragLeave={handleDrag}
+              onDragOver={handleDrag}
+              onDrop={handleDrop}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'var(--mondrian-red)';
-                e.currentTarget.style.transform = 'translateY(-2px)';
+                if (!dragActive) {
+                  e.currentTarget.style.borderColor = 'var(--mondrian-red)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--mondrian-blue)';
-                e.currentTarget.style.transform = 'translateY(0)';
+                if (!dragActive) {
+                  e.currentTarget.style.borderColor = 'var(--mondrian-blue)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }
               }}
             >
               <div className="absolute top-4 left-4 w-3 h-3 rounded-full" style={{background: 'var(--mondrian-red)'}}></div>
@@ -600,15 +692,23 @@ const ProcessPage: React.FC = () => {
                 <div className="flex gap-3">
                   <button
                     onClick={handleBatchProcess}
-                    disabled={isProcessing || !isApiConfigured()}
+                    disabled={!isApiConfigured()}
                     className="apple-button flex items-center px-6 py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                      background: isProcessing || !isApiConfigured() ? 'var(--apple-gray-300)' : 'var(--mondrian-blue)',
-                      color: 'white'
+                      background: !isApiConfigured() ? 'var(--apple-gray-300)' : 
+                                 isProcessing ? 'var(--mondrian-white)' : 'var(--mondrian-blue)',
+                      color: !isApiConfigured() ? 'white' : 
+                             isProcessing ? 'var(--mondrian-black)' : 'white',
+                      border: isProcessing ? '2px solid var(--apple-gray-200)' : 'none',
+                      display: 'none'
                     }}
                   >
-                    <Play className="w-4 h-4 mr-2" />
-                    {isProcessing ? '处理中...' : '一键处理'}
+                    {isProcessing ? (
+                      <Pause className="w-4 h-4 mr-2" style={{color: 'var(--mondrian-black)'}} />
+                    ) : (
+                      <Play className="w-4 h-4 mr-2" />
+                    )}
+                    {isProcessing ? '暂停处理' : isPaused ? '继续处理' : '一键处理'}
                   </button>
                   <button
                     onClick={generateZip}

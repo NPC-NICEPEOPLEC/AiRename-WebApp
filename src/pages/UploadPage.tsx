@@ -110,8 +110,17 @@ export default function UploadPage() {
       return;
     }
     
-    // 将文件数据传递到处理页面
-    navigate('/process', { state: { files } });
+    // 跳转到处理页面，传递文件数据和自动处理标志
+    navigate('/process', {
+      state: {
+        files: files.map(f => ({
+          id: f.id,
+          file: f.file,
+          originalName: f.originalName
+        })),
+        autoProcess: true // 添加自动处理标志
+      }
+    });
   };
 
   return (
