@@ -46,25 +46,91 @@ const ProcessPage: React.FC = () => {
 
   // 检查API配置
   const isApiConfigured = () => {
-    const apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY;
-    const apiUrl = import.meta.env.VITE_DEEPSEEK_API_BASE_URL;
-    return apiKey && apiKey !== 'your_deepseek_api_key_here' && apiUrl;
+    const backendUrl = import.meta.env.VITE_BACKEND_API_URL;
+    return backendUrl && backendUrl !== '';
+  };
+
+  // 支持的文件类型 - 与后端保持一致
+  const supportedTypes = [
+    // 文本文档
+    '.txt', '.md', '.rtf', '.tex', '.log', '.csv', '.tsv',
+    // Microsoft Office
+    '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
+    // OpenOffice/LibreOffice
+    '.odt', '.ods', '.odp', '.odg', '.odf',
+    // 代码文件
+    '.py', '.js', '.html', '.htm', '.css', '.json', '.xml', '.yaml', '.yml',
+    '.java', '.cpp', '.c', '.h', '.php', '.rb', '.go', '.rs', '.swift', '.kt',
+    '.sql', '.sh', '.bat', '.ps1', '.r', '.m', '.scala', '.pl', '.lua',
+    // PDF和电子书
+    '.pdf', '.epub', '.mobi', '.azw', '.azw3',
+    // 图片格式
+    '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff', '.tif', '.webp', '.svg',
+    '.ico', '.psd', '.ai', '.eps', '.raw', '.cr2', '.nef', '.arw',
+    // 音视频格式
+    '.mp3', '.wav', '.flac', '.aac', '.ogg', '.wma', '.m4a',
+    '.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv', '.webm', '.m4v',
+    // 压缩文件
+    '.zip', '.rar', '.7z', '.tar', '.gz', '.bz2', '.xz',
+    // 其他常见格式
+    '.ics', '.vcf', '.kml', '.gpx', '.dwg', '.dxf', '.step', '.stl'
+  ];
+
+  // 验证文件
+  const validateFile = (file: File): string | null => {
+    const extension = '.' + file.name.split('.').pop()?.toLowerCase();
+    if (!supportedTypes.includes(extension)) {
+      return `不支持的文件类型: ${extension}`;
+    }
+    if (file.size > 200 * 1024 * 1024) { // 200MB
+      return '文件大小超过 200MB 限制';
+    }
+    return null;
   };
 
   // 文件上传处理
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFiles = Array.from(event.target.files || []);
-    const newFiles: FileItem[] = uploadedFiles.map(file => ({
-      id: Math.random().toString(36).substr(2, 9),
-      file,
-      originalName: file.name,
-      newName: file.name,
-      editedName: file.name,
-      isEditing: false,
-      isProcessing: false,
-      isProcessed: false
-    }));
-    setFiles(prev => [...prev, ...newFiles]);
+    const newFiles: FileItem[] = [];
+    const errors: string[] = [];
+
+    uploadedFiles.forEach((file) => {
+      const error = validateFile(file);
+      if (error) {
+        errors.push(`${file.name}: ${error}`);
+        return;
+      }
+
+      // 检查是否已存在
+      if (files.some(f => f.originalName === file.name)) {
+        errors.push(`${file.name}: 文件已存在`);
+        return;
+      }
+
+      newFiles.push({
+        id: Math.random().toString(36).substr(2, 9),
+        file,
+        originalName: file.name,
+        newName: file.name,
+        editedName: file.name,
+        isEditing: false,
+        isProcessing: false,
+        isProcessed: false
+      });
+    });
+
+    if (errors.length > 0) {
+      alert('以下文件无法添加:\n' + errors.join('\n'));
+    }
+
+    if (newFiles.length > 0) {
+      const totalFiles = files.length + newFiles.length;
+      if (totalFiles > 10) {
+        alert('最多只能同时处理 10 个文件');
+        return;
+      }
+      setFiles(prev => [...prev, ...newFiles]);
+    }
   };
 
   // 拖拽处理
@@ -85,29 +151,58 @@ const ProcessPage: React.FC = () => {
     
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const uploadedFiles = Array.from(e.dataTransfer.files);
-      const newFiles: FileItem[] = uploadedFiles.map(file => ({
-        id: Math.random().toString(36).substr(2, 9),
-        file,
-        originalName: file.name,
-        newName: file.name,
-        editedName: file.name,
-        isEditing: false,
-        isProcessing: false,
-        isProcessed: false
-      }));
-      setFiles(prev => [...prev, ...newFiles]);
-      
-      // 拖拽上传的文件不自动开始处理，需要手动点击"一键处理"
-      // 移除自动处理逻辑
+      const newFiles: FileItem[] = [];
+      const errors: string[] = [];
+
+      uploadedFiles.forEach((file) => {
+        const error = validateFile(file);
+        if (error) {
+          errors.push(`${file.name}: ${error}`);
+          return;
+        }
+
+        // 检查是否已存在
+        if (files.some(f => f.originalName === file.name)) {
+          errors.push(`${file.name}: 文件已存在`);
+          return;
+        }
+
+        newFiles.push({
+          id: Math.random().toString(36).substr(2, 9),
+          file,
+          originalName: file.name,
+          newName: file.name,
+          editedName: file.name,
+          isEditing: false,
+          isProcessing: false,
+          isProcessed: false
+        });
+      });
+
+      if (errors.length > 0) {
+        alert('以下文件无法添加:\n' + errors.join('\n'));
+      }
+
+      if (newFiles.length > 0) {
+        const totalFiles = files.length + newFiles.length;
+        if (totalFiles > 10) {
+          alert('最多只能同时处理 10 个文件');
+          return;
+        }
+        setFiles(prev => [...prev, ...newFiles]);
+      }
     }
   };
 
   // 读取文件内容
   const readFileContent = async (file: File): Promise<string> => {
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
-    const isTextFile = ['txt', 'md', 'json', 'js', 'ts', 'jsx', 'tsx', 'css', 'html', 'xml', 'csv'].includes(fileExtension || '');
-    const isImageFile = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(fileExtension || '');
-    const isBinaryFile = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(fileExtension || '');
+    const isTextFile = ['txt', 'md', 'rtf', 'tex', 'log', 'csv', 'tsv', 'json', 'js', 'ts', 'jsx', 'tsx', 'css', 'html', 'htm', 'xml', 'yaml', 'yml', 'java', 'cpp', 'c', 'h', 'php', 'rb', 'go', 'rs', 'swift', 'kt', 'sql', 'sh', 'bat', 'ps1', 'r', 'm', 'scala', 'pl', 'lua', 'py'].includes(fileExtension || '');
+    const isImageFile = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif', 'webp', 'svg', 'ico', 'psd', 'ai', 'eps', 'raw', 'cr2', 'nef', 'arw'].includes(fileExtension || '');
+    const isBinaryFile = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp', 'odg', 'odf', 'epub', 'mobi', 'azw', 'azw3'].includes(fileExtension || '');
+    const isMediaFile = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a', 'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v'].includes(fileExtension || '');
+    const isArchiveFile = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz'].includes(fileExtension || '');
+    const isSpecialFile = ['ics', 'vcf', 'kml', 'gpx', 'dwg', 'dxf', 'step', 'stl'].includes(fileExtension || '');
 
     if (isTextFile) {
       try {
@@ -147,6 +242,33 @@ const ProcessPage: React.FC = () => {
              `请根据文件名、大小、修改时间等信息推断文档的内容和用途。`;
     }
 
+    if (isMediaFile) {
+      return `这是一个${fileInfo.extension}媒体文件，详细信息：\n` +
+             `- 原始文件名：${fileInfo.name}\n` +
+             `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
+             `- 媒体类型：${fileInfo.extension}\n` +
+             `- 最后修改时间：${fileInfo.lastModified}\n` +
+             `请根据文件名、时间等信息推断媒体文件的用途和内容。`;
+    }
+
+    if (isArchiveFile) {
+      return `这是一个${fileInfo.extension}压缩文件，详细信息：\n` +
+             `- 原始文件名：${fileInfo.name}\n` +
+             `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
+             `- 压缩格式：${fileInfo.extension}\n` +
+             `- 最后修改时间：${fileInfo.lastModified}\n` +
+             `请根据文件名等信息推断压缩包的用途和可能包含的内容。`;
+    }
+
+    if (isSpecialFile) {
+      return `这是一个${fileInfo.extension}专业格式文件，详细信息：\n` +
+             `- 原始文件名：${fileInfo.name}\n` +
+             `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
+             `- 文件格式：${fileInfo.extension}\n` +
+             `- 最后修改时间：${fileInfo.lastModified}\n` +
+             `请根据文件名、格式等信息推断文件的专业用途和内容。`;
+    }
+
     // 其他文件类型
     return `这是一个${fileInfo.extension}文件，详细信息：\n` +
            `- 原始文件名：${fileInfo.name}\n` +
@@ -156,136 +278,48 @@ const ProcessPage: React.FC = () => {
            `请根据可用信息推断文件的用途和内容。`;
   };
 
-  // 调用 DeepSeek API
-  const callDeepSeekAPI = async (content: string, filename: string): Promise<string> => {
+  // 调用后端 API - 直接发送原始文件
+  const callDeepSeekAPI = async (file: File): Promise<string> => {
     try {
-      const prompt = `你是一位智能文档理解与命名专家，专门负责深度分析文档内容并生成高质量的文件名。
+      const backendUrl = import.meta.env.VITE_BACKEND_API_URL;
+      
+      if (!backendUrl) {
+        throw new Error('后端API配置缺失，请检查.env文件中的VITE_BACKEND_API_URL配置');
+      }
 
-## 专家档案
-**身份**: 智能文档理解与命名专家  
-**专长**: 文档内容深度分析、信息提取、专业命名  
-**经验**: 15年+ 文档管理与知识组织经验  
-**语言**: 中文为主，支持多语言文档  
+      // 创建FormData并直接发送原始文件
+      const formData = new FormData();
+      formData.append('file', file, file.name); // 确保文件名正确传递
+      formData.append('file_type', '通用文档');
+      
+      console.log('发送文件到后端:', {
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size
+      });
 
-## 核心任务
-你需要对提供的文档信息进行**全面深度分析**，然后生成一个比原文件名更有意义、更专业的新文件名。
-
-## 分析要求
-1. **深度理解**: 仔细分析文档的所有可用信息（内容、文件名、大小、类型、时间等）
-2. **信息提取**: 从文档信息中提取关键要素：
-   - 主题或内容类型
-   - 时间信息（日期、版本、期间等）
-   - 项目或主体名称
-   - 文档性质（报告、计划、记录、分析等）
-   - 重要关键词
-3. **智能推理**: 根据文件名模式、内容特征推断文档的实际用途和重要性
-4. **专业命名**: 生成比原名更专业、更有描述性的文件名
-
-## 命名原则
-- **描述性**: 新文件名必须比原文件名更能描述文档内容
-- **专业性**: 使用专业、规范的词汇
-- **简洁性**: 控制在15个中文字符以内
-- **唯一性**: 包含足够的区分信息
-- **可搜索性**: 包含关键词，便于检索
-- **规范性**: 符合文件命名规范，避免特殊字符
-
-## 特殊处理规则
-- **图片文件**: 根据文件名推断拍摄时间、地点、事件或用途
-- **办公文档**: 识别文档类型（报告、计划、总结等）和主题
-- **代码文件**: 识别项目名称、功能模块或技术特征
-- **截图文件**: 根据命名模式推断截图内容类型
-- **日期文件**: 提取并规范化日期格式，添加描述性信息
-
-## 响应格式
-请严格按照以下JSON格式返回，不要使用代码块标记：
-{
-  "summary": "对文档信息的深度分析总结，说明文档的主要特征和推断的用途",
-  "title": "基于深度分析生成的新文件名（不含扩展名，必须比原文件名更有意义）"
-}
-
-## 分析示例
-
-**示例1 - 图片文件**
-输入: "这是一个图片文件，原始文件名：IMG_20240315_143022，文件大小：2.5MB，图片格式：JPG"
-输出:
-{
-  "summary": "根据文件名分析，这是2024年3月15日14:30拍摄的照片，可能是重要事件或场景的记录",
-  "title": "2024年3月15日重要场景记录"
-}
-
-**示例2 - 办公文档**
-输入: "这是一个Word文档，原始文件名：文档1，文件大小：1.2MB，最后修改时间：2024/1/15"
-输出:
-{
-  "summary": "这是一个在2024年1月15日修改的Word文档，文件较大说明内容丰富，需要根据实际用途重新命名",
-  "title": "2024年1月工作文档"
-}
-
-现在请对以下文档进行**深度分析**:
-
-文档信息: ${content}
-原始文件名: ${filename}
-
-请仔细分析所有可用信息，生成一个比原文件名更有意义的新文件名。`;
-
-      const response = await fetch(`${import.meta.env.VITE_DEEPSEEK_API_BASE_URL}/chat/completions`, {
+      const response = await fetch(`${backendUrl}/api/process-document/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_DEEPSEEK_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          max_tokens: 2000,
-          temperature: 0.7
-        })
+        body: formData
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         if (response.status === 401) {
-          throw new Error('API密钥无效或已过期，请检查.env文件中的VITE_DEEPSEEK_API_KEY配置');
+          throw new Error('API密钥无效或已过期，请检查后端.env文件中的DEEPSEEK_API_KEY配置');
         }
-        throw new Error(`API 请求失败: ${response.status} - ${errorData.error?.message || '未知错误'}`);
+        throw new Error(`后端API请求失败: ${response.status} - ${errorData.detail || '未知错误'}`);
       }
 
       const data = await response.json();
-      const aiResponse = data.choices[0]?.message?.content;
       
-      if (!aiResponse) {
-        throw new Error('AI 响应为空');
+      if (!data.ai_result || !data.ai_result.title) {
+        throw new Error('后端API响应格式错误');
       }
 
-      // 解析 JSON 响应
-      try {
-        const jsonMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/) || aiResponse.match(/{[\s\S]*}/);
-        if (jsonMatch) {
-          const jsonStr = jsonMatch[1] || jsonMatch[0];
-          const parsed = JSON.parse(jsonStr);
-          return parsed.title || '智能重命名文件';
-        } else {
-          // 如果没有找到JSON格式，尝试直接解析
-          const parsed = JSON.parse(aiResponse);
-          return parsed.title || '智能重命名文件';
-        }
-      } catch (parseError) {
-        console.warn('JSON 解析失败，使用原始响应:', parseError);
-        // 清理响应文本
-        const cleanedResponse = aiResponse
-          .replace(/```json|```/g, '')
-          .replace(/[\r\n]/g, '')
-          .replace(/[<>:"/\\|?*]/g, '')
-          .trim();
-        return cleanedResponse.slice(0, 50) || '智能重命名文件';
-      }
+      return data.ai_result.title || '智能重命名文件';
     } catch (error) {
-      console.error('DeepSeek API 调用失败:', error);
+      console.error('后端API调用失败:', error);
       throw error;
     }
   };
@@ -297,8 +331,8 @@ const ProcessPage: React.FC = () => {
         f.id === fileItem.id ? { ...f, isProcessing: true } : f
       ));
 
-      const content = await readFileContent(fileItem.file);
-      const newName = await callDeepSeekAPI(content, fileItem.originalName);
+      // 直接发送原始文件到后端进行处理
+      const newName = await callDeepSeekAPI(fileItem.file);
       
       // 保留原文件扩展名
       const extension = fileItem.originalName.split('.').pop();
@@ -500,7 +534,7 @@ const ProcessPage: React.FC = () => {
   };
 
   // 生成文件名（按照用户要求的格式）
-  const generateFileName = (extension: string = 'zip') => {
+  const generateFileName = (extension: string) => {
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -509,7 +543,7 @@ const ProcessPage: React.FC = () => {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
     
-    return `irAiRename${year}${month}${day}_${hours}${minutes}${seconds}.${extension}`;
+    return `AiRename${year}${month}${day}_${hours}${minutes}${seconds}.${extension}`;
   };
 
   // 生成ZIP文件（只包含选中的文件）
@@ -563,7 +597,7 @@ const ProcessPage: React.FC = () => {
                 <FileText className="h-8 w-8 text-white" />
               </div>
               <div className="space-y-1">
-                <h1 className="text-2xl font-bold" style={{ color: 'var(--mondrian-black)' }}>《AiRename - 智能重命名助手》</h1>
+                <h1 className="text-2xl font-bold" style={{ color: 'var(--mondrian-black)' }}>智能文件重命名</h1>
                 <p className="text-base font-medium" style={{ color: 'var(--mondrian-blue)' }}>让每个文件都有意义的名字</p>
               </div>
             </div>
@@ -603,12 +637,12 @@ const ProcessPage: React.FC = () => {
               <div className="flex items-start">
                 <AlertCircle className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0" style={{color: 'var(--mondrian-red)'}} />
                 <div style={{color: 'var(--mondrian-black)'}}>
-                  <p className="font-medium mb-2">⚠️ 需要配置DeepSeek API密钥</p>
-                  <p className="text-sm mb-2">请在.env文件中设置有效的VITE_DEEPSEEK_API_KEY。</p>
+                  <p className="font-medium mb-2">⚠️ 需要配置后端API服务</p>
+                  <p className="text-sm mb-2">请确保后端服务器正在运行，并在.env文件中设置VITE_BACKEND_API_URL。</p>
                   <div className="text-sm space-y-1">
-                    <p><strong>获取方式：</strong></p>
-                    <p>• 官方平台：<a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{color: 'var(--mondrian-blue)'}}>platform.deepseek.com/api_keys</a> (注意：已暂停新用户赠款)</p>
-                    <p>• 第三方平台：<a href="https://api.siliconflow.cn" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{color: 'var(--mondrian-blue)'}}>SiliconFlow</a> (可能提供免费额度)</p>
+                    <p><strong>后端配置：</strong></p>
+                    <p>• 后端服务器地址：<code style={{background: 'var(--apple-gray-100)', padding: '2px 4px', borderRadius: '4px'}}>http://localhost:8001</code></p>
+                    <p>• 确保后端服务器已启动并配置了有效的DeepSeek API密钥</p>
                   </div>
                 </div>
               </div>

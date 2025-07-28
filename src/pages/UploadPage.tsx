@@ -14,10 +14,30 @@ export default function UploadPage() {
   const [dragActive, setDragActive] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  // 支持的文件类型
+  // 支持的文件类型 - 与后端保持一致
   const supportedTypes = [
-    '.txt', '.md', '.doc', '.docx', '.xls', '.xlsx', 
-    '.py', '.pdf', '.ppt', '.pptx', '.png', '.jpg', '.jpeg', '.gif'
+    // 文本文档
+    '.txt', '.md', '.rtf', '.tex', '.log', '.csv', '.tsv',
+    // Microsoft Office
+    '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
+    // OpenOffice/LibreOffice
+    '.odt', '.ods', '.odp', '.odg', '.odf',
+    // 代码文件
+    '.py', '.js', '.html', '.htm', '.css', '.json', '.xml', '.yaml', '.yml',
+    '.java', '.cpp', '.c', '.h', '.php', '.rb', '.go', '.rs', '.swift', '.kt',
+    '.sql', '.sh', '.bat', '.ps1', '.r', '.m', '.scala', '.pl', '.lua',
+    // PDF和电子书
+    '.pdf', '.epub', '.mobi', '.azw', '.azw3',
+    // 图片格式
+    '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff', '.tif', '.webp', '.svg',
+    '.ico', '.psd', '.ai', '.eps', '.raw', '.cr2', '.nef', '.arw',
+    // 音视频格式
+    '.mp3', '.wav', '.flac', '.aac', '.ogg', '.wma', '.m4a',
+    '.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv', '.webm', '.m4v',
+    // 压缩文件
+    '.zip', '.rar', '.7z', '.tar', '.gz', '.bz2', '.xz',
+    // 其他常见格式
+    '.ics', '.vcf', '.kml', '.gpx', '.dwg', '.dxf', '.step', '.stl'
   ];
 
   // 验证文件
@@ -134,7 +154,7 @@ export default function UploadPage() {
                 <FileText className="h-8 w-8 text-white" />
               </div>
               <div className="space-y-1">
-                <h1 className="text-2xl font-bold" style={{ color: 'var(--mondrian-black)' }}>《AiRename - 智能重命名助手》</h1>
+                <h1 className="text-2xl font-bold" style={{ color: 'var(--mondrian-black)' }}>智能文件重命名</h1>
                 <p className="text-base font-medium" style={{ color: 'var(--mondrian-blue)' }}>让每个文件都有意义的名字</p>
               </div>
             </div>
@@ -193,7 +213,7 @@ export default function UploadPage() {
             </p>
             <div className="bg-gray-50 rounded-xl p-6 mb-6 border-l-4" style={{ borderLeftColor: 'var(--mondrian-red)' }}>
               <p className="text-sm font-medium" style={{ color: 'var(--mondrian-black)' }}>
-                支持格式：.txt, .md, .doc, .docx, .xls, .xlsx, .py, .pdf, .ppt, .pptx, .png, .jpg, .jpeg, .gif
+                支持格式：文档(.txt, .md, .doc, .docx, .pdf等)、表格(.xls, .xlsx, .csv等)、图片(.png, .jpg, .gif等)、代码(.py, .js, .java等)、音视频(.mp3, .mp4等)及60+种常见格式
               </p>
               <p className="text-sm mt-2" style={{ color: 'var(--mondrian-blue)' }}>
                 单个文件最大 200MB，最多同时处理 10 个文件
@@ -202,7 +222,7 @@ export default function UploadPage() {
             <input
               type="file"
               multiple
-              accept=".txt,.md,.doc,.docx,.xls,.xlsx,.py,.pdf,.ppt,.pptx,.png,.jpg,.jpeg,.gif"
+              accept=".txt,.md,.doc,.docx,.xls,.xlsx,.py,.pdf,.ppt,.pptx,.png,.jpg,.jpeg,.gif,.rtf,.csv,.json,.xml,.html,.css,.js,.java,.cpp,.php,.go,.mp3,.mp4,.zip,.rar"
               onChange={handleFileInput}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               disabled={isUploading}

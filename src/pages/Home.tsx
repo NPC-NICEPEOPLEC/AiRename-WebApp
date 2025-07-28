@@ -51,8 +51,31 @@ export default function Home() {
     const maxFiles = parseInt(import.meta.env.VITE_MAX_FILES_COUNT || '10');
     const maxSize = 200 * 1024 * 1024; // 200MB
     
-    // 支持的文件类型
-    const supportedExtensions = ['.txt', '.md', '.doc', '.docx', '.xls', '.xlsx', '.py', '.pdf', '.ppt', '.pptx', '.png', '.jpg', '.jpeg', '.gif'];
+    // 支持的文件类型 - 与后端保持一致
+    const supportedExtensions = [
+      // 文本文档
+      '.txt', '.md', '.rtf', '.tex', '.log', '.csv', '.tsv',
+      // Microsoft Office
+      '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
+      // OpenOffice/LibreOffice
+      '.odt', '.ods', '.odp', '.odg', '.odf',
+      // 代码文件
+      '.py', '.js', '.html', '.htm', '.css', '.json', '.xml', '.yaml', '.yml',
+      '.java', '.cpp', '.c', '.h', '.php', '.rb', '.go', '.rs', '.swift', '.kt',
+      '.sql', '.sh', '.bat', '.ps1', '.r', '.m', '.scala', '.pl', '.lua',
+      // PDF和电子书
+      '.pdf', '.epub', '.mobi', '.azw', '.azw3',
+      // 图片格式
+      '.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff', '.tif', '.webp', '.svg',
+      '.ico', '.psd', '.ai', '.eps', '.raw', '.cr2', '.nef', '.arw',
+      // 音视频格式
+      '.mp3', '.wav', '.flac', '.aac', '.ogg', '.wma', '.m4a',
+      '.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv', '.webm', '.m4v',
+      // 压缩文件
+      '.zip', '.rar', '.7z', '.tar', '.gz', '.bz2', '.xz',
+      // 其他常见格式
+      '.ics', '.vcf', '.kml', '.gpx', '.dwg', '.dxf', '.step', '.stl'
+    ];
     
     // 过滤文件类型和大小
     const validFiles = fileList.filter(file => {
@@ -63,7 +86,7 @@ export default function Home() {
     }).slice(0, maxFiles);
 
     if (validFiles.length === 0) {
-      alert('请选择有效的文件格式（支持 .txt, .md, .doc, .docx, .xls, .xlsx, .py, .pdf, .ppt, .pptx, .png, .jpg, .jpeg, .gif，大小不超过 200MB）');
+      alert('请选择有效的文件格式（支持文档、表格、图片、代码、音视频等60+种常见格式，大小不超过 200MB）');
       return;
     }
 
@@ -120,7 +143,18 @@ export default function Home() {
     
     try {
       // 文本文件直接读取
-      if (fileName.endsWith('.txt') || fileName.endsWith('.md') || fileName.endsWith('.py')) {
+      if (fileName.endsWith('.txt') || fileName.endsWith('.md') || fileName.endsWith('.py') || 
+          fileName.endsWith('.js') || fileName.endsWith('.html') || fileName.endsWith('.htm') ||
+          fileName.endsWith('.css') || fileName.endsWith('.json') || fileName.endsWith('.xml') ||
+          fileName.endsWith('.yaml') || fileName.endsWith('.yml') || fileName.endsWith('.java') ||
+          fileName.endsWith('.cpp') || fileName.endsWith('.c') || fileName.endsWith('.h') ||
+          fileName.endsWith('.php') || fileName.endsWith('.rb') || fileName.endsWith('.go') ||
+          fileName.endsWith('.rs') || fileName.endsWith('.swift') || fileName.endsWith('.kt') ||
+          fileName.endsWith('.sql') || fileName.endsWith('.sh') || fileName.endsWith('.bat') ||
+          fileName.endsWith('.ps1') || fileName.endsWith('.r') || fileName.endsWith('.m') ||
+          fileName.endsWith('.scala') || fileName.endsWith('.pl') || fileName.endsWith('.lua') ||
+          fileName.endsWith('.rtf') || fileName.endsWith('.tex') || fileName.endsWith('.log') ||
+          fileName.endsWith('.csv') || fileName.endsWith('.tsv')) {
         return new Promise((resolve, reject) => {
           const reader = new FileReader();
           reader.onload = (e) => resolve(e.target?.result as string);
@@ -129,16 +163,18 @@ export default function Home() {
         });
       }
       
-      // Word文档
-      if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+      // Word文档和OpenOffice文档
+      if (fileName.endsWith('.doc') || fileName.endsWith('.docx') || 
+          fileName.endsWith('.odt')) {
         const arrayBuffer = await file.arrayBuffer();
         const mammoth = await import('mammoth');
         const result = await mammoth.extractRawText({ arrayBuffer });
         return result.value;
       }
       
-      // Excel文件
-      if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) {
+      // Excel文件和OpenOffice表格
+      if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx') || 
+          fileName.endsWith('.ods')) {
         const arrayBuffer = await file.arrayBuffer();
         const XLSX = await import('xlsx');
         const workbook = XLSX.read(arrayBuffer, { type: 'array' });
@@ -158,14 +194,55 @@ export default function Home() {
         return data.text;
       }
       
-      // PowerPoint文件 - 暂时返回文件名信息
-      if (fileName.endsWith('.ppt') || fileName.endsWith('.pptx')) {
-        return `PowerPoint演示文稿: ${file.name}\n文件大小: ${(file.size / 1024 / 1024).toFixed(2)}MB\n创建时间: ${new Date(file.lastModified).toLocaleString()}`;
+      // PowerPoint文件和OpenOffice演示文稿 - 暂时返回文件名信息
+      if (fileName.endsWith('.ppt') || fileName.endsWith('.pptx') || 
+          fileName.endsWith('.odp')) {
+        return `演示文稿: ${file.name}\n文件大小: ${(file.size / 1024 / 1024).toFixed(2)}MB\n创建时间: ${new Date(file.lastModified).toLocaleString()}`;
+      }
+      
+      // 电子书文件
+      if (fileName.endsWith('.epub') || fileName.endsWith('.mobi') || 
+          fileName.endsWith('.azw') || fileName.endsWith('.azw3')) {
+        return `电子书文件: ${file.name}\n文件大小: ${(file.size / 1024 / 1024).toFixed(2)}MB\n文件类型: ${file.type}\n最后修改: ${new Date(file.lastModified).toLocaleString()}`;
       }
       
       // 图片文件 - 返回文件信息
-      if (fileName.endsWith('.png') || fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || fileName.endsWith('.gif')) {
+      if (fileName.endsWith('.png') || fileName.endsWith('.jpg') || fileName.endsWith('.jpeg') || 
+          fileName.endsWith('.gif') || fileName.endsWith('.bmp') || fileName.endsWith('.tiff') ||
+          fileName.endsWith('.tif') || fileName.endsWith('.webp') || fileName.endsWith('.svg') ||
+          fileName.endsWith('.ico') || fileName.endsWith('.psd') || fileName.endsWith('.ai') ||
+          fileName.endsWith('.eps') || fileName.endsWith('.raw') || fileName.endsWith('.cr2') ||
+          fileName.endsWith('.nef') || fileName.endsWith('.arw')) {
         return `图片文件: ${file.name}\n文件大小: ${(file.size / 1024 / 1024).toFixed(2)}MB\n文件类型: ${file.type}\n最后修改: ${new Date(file.lastModified).toLocaleString()}`;
+      }
+      
+      // 音频文件
+      if (fileName.endsWith('.mp3') || fileName.endsWith('.wav') || fileName.endsWith('.flac') ||
+          fileName.endsWith('.aac') || fileName.endsWith('.ogg') || fileName.endsWith('.wma') ||
+          fileName.endsWith('.m4a')) {
+        return `音频文件: ${file.name}\n文件大小: ${(file.size / 1024 / 1024).toFixed(2)}MB\n文件类型: ${file.type}\n最后修改: ${new Date(file.lastModified).toLocaleString()}`;
+      }
+      
+      // 视频文件
+      if (fileName.endsWith('.mp4') || fileName.endsWith('.avi') || fileName.endsWith('.mkv') ||
+          fileName.endsWith('.mov') || fileName.endsWith('.wmv') || fileName.endsWith('.flv') ||
+          fileName.endsWith('.webm') || fileName.endsWith('.m4v')) {
+        return `视频文件: ${file.name}\n文件大小: ${(file.size / 1024 / 1024).toFixed(2)}MB\n文件类型: ${file.type}\n最后修改: ${new Date(file.lastModified).toLocaleString()}`;
+      }
+      
+      // 压缩文件
+      if (fileName.endsWith('.zip') || fileName.endsWith('.rar') || fileName.endsWith('.7z') ||
+          fileName.endsWith('.tar') || fileName.endsWith('.gz') || fileName.endsWith('.bz2') ||
+          fileName.endsWith('.xz')) {
+        return `压缩文件: ${file.name}\n文件大小: ${(file.size / 1024 / 1024).toFixed(2)}MB\n文件类型: ${file.type}\n最后修改: ${new Date(file.lastModified).toLocaleString()}`;
+      }
+      
+      // 其他专业格式文件
+      if (fileName.endsWith('.ics') || fileName.endsWith('.vcf') || fileName.endsWith('.kml') ||
+          fileName.endsWith('.gpx') || fileName.endsWith('.dwg') || fileName.endsWith('.dxf') ||
+          fileName.endsWith('.step') || fileName.endsWith('.stl') || fileName.endsWith('.odg') ||
+          fileName.endsWith('.odf')) {
+        return `专业格式文件: ${file.name}\n文件大小: ${(file.size / 1024 / 1024).toFixed(2)}MB\n文件类型: ${file.type}\n最后修改: ${new Date(file.lastModified).toLocaleString()}`;
       }
       
       // 默认情况
@@ -363,7 +440,7 @@ ${content.substring(0, 3000)}
                 <FileText className="h-8 w-8 text-white" />
               </div>
               <div className="space-y-1">
-                <h1 className="text-2xl font-bold" style={{ color: 'var(--mondrian-black)' }}>《AiRename - 智能重命名助手》</h1>
+                <h1 className="text-2xl font-bold" style={{ color: 'var(--mondrian-black)' }}>智能文件重命名</h1>
                 <p className="text-base font-medium" style={{ color: 'var(--mondrian-blue)' }}>让每个文件都有意义的名字</p>
               </div>
             </div>

@@ -175,7 +175,7 @@ export default function HistoryPage() {
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
     
-    return `irAiRename${year}${month}${day}_${hours}${minutes}${seconds}.${extension}`;
+    return `AiRename${year}${month}${day}_${hours}${minutes}${seconds}.${extension}`;
   };
 
   // 下载选中的文件名映射表
@@ -350,7 +350,7 @@ export default function HistoryPage() {
                 <FileText className="h-8 w-8 text-white" />
               </div>
               <div className="space-y-1">
-                <h1 className="text-2xl font-bold" style={{color: 'var(--mondrian-black)'}}>《AiRename - 智能重命名助手》</h1>
+                <h1 className="text-2xl font-bold" style={{color: 'var(--mondrian-black)'}}>智能文件重命名</h1>
                 <p className="text-base font-medium" style={{color: 'var(--mondrian-blue)'}}>让每个文件都有意义的名字</p>
               </div>
               <div className="ml-4 text-sm" style={{color: 'var(--mondrian-red)'}}>
