@@ -514,7 +514,7 @@ const ProcessPage: React.FC = () => {
       totalFiles: files.length
     };
 
-    const existingHistory = localStorage.getItem('intellirename_history');
+    const existingHistory = localStorage.getItem('airename_history');
     let history = [];
     if (existingHistory) {
       try {
@@ -530,7 +530,7 @@ const ProcessPage: React.FC = () => {
       history = history.slice(0, 50);
     }
 
-    localStorage.setItem('intellirename_history', JSON.stringify(history));
+    localStorage.setItem('airename_history', JSON.stringify(history));
   };
 
   // 生成文件名（按照用户要求的格式）

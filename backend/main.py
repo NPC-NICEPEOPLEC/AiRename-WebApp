@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ET
 load_dotenv()
 
 app = FastAPI(
-    title="IntelliRename API",
+    title="AiRename API",
     description="一个使用 AI 模型智能处理文档的后端服务。",
     version="1.0.0",
 )
@@ -34,6 +34,7 @@ origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",  # 支持所有 Vercel 子域名
     allow_credentials=True,
     allow_methods=["*"], # 允许所有 HTTP 方法
     allow_headers=["*"], # 允许所有 HTTP 头
@@ -470,7 +471,7 @@ async def api_process_document(
 
 @app.get("/")
 def read_root():
-    return {"message": "IntelliRename Backend is running."}
+    return {"message": "AiRename Backend is running."}
 
 if __name__ == "__main__":
     import uvicorn

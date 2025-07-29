@@ -33,7 +33,7 @@ export default function HistoryPage() {
 
   // 从localStorage加载历史记录并转换格式
   useEffect(() => {
-    const savedHistory = localStorage.getItem('intellirename_history');
+    const savedHistory = localStorage.getItem('airename_history');
     if (savedHistory) {
       try {
         const legacyHistory: LegacyHistoryItem[] = JSON.parse(savedHistory);
@@ -131,7 +131,7 @@ export default function HistoryPage() {
     } else {
       // 清空所有记录
       setFileRecords([]);
-      localStorage.removeItem('intellirename_history');
+      localStorage.removeItem('airename_history');
     }
     setSelectedFiles(new Set());
     setShowClearConfirm(false);
@@ -162,7 +162,7 @@ export default function HistoryPage() {
     });
     
     const legacyHistory = Array.from(batchMap.values());
-    localStorage.setItem('intellirename_history', JSON.stringify(legacyHistory));
+    localStorage.setItem('airename_history', JSON.stringify(legacyHistory));
   };
 
   // 生成文件名（按照用户要求的格式）
