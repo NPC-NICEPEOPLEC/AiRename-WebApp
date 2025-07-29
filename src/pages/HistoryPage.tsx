@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, Clock, Download, Trash2, Home, History, CheckSquare, Square, File, Image, AlertTriangle, X } from 'lucide-react';
-import JSZip from 'jszip';
+import { FileText, Clock, Download, Trash2, Home, History, CheckSquare, Square, File, Image, AlertTriangle } from 'lucide-react';
 
 // 新的文件记录接口
 interface FileRecord {
@@ -29,7 +28,7 @@ export default function HistoryPage() {
   const [selectAll, setSelectAll] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [deleteAction, setDeleteAction] = useState<'selected' | 'clear'>('selected');
+
 
   // 从localStorage加载历史记录并转换格式
   useEffect(() => {
@@ -100,7 +99,6 @@ export default function HistoryPage() {
   // 删除选中的文件记录
   const deleteSelectedFiles = () => {
     if (selectedFiles.size === 0) return;
-    setDeleteAction('selected');
     setShowDeleteConfirm(true);
   };
 
@@ -115,7 +113,6 @@ export default function HistoryPage() {
 
   // 清空所有历史记录
   const clearAllHistory = () => {
-    setDeleteAction('clear');
     setShowClearConfirm(true);
   };
 

@@ -194,89 +194,89 @@ const ProcessPage: React.FC = () => {
     }
   };
 
-  // 读取文件内容
-  const readFileContent = async (file: File): Promise<string> => {
-    const fileExtension = file.name.split('.').pop()?.toLowerCase();
-    const isTextFile = ['txt', 'md', 'rtf', 'tex', 'log', 'csv', 'tsv', 'json', 'js', 'ts', 'jsx', 'tsx', 'css', 'html', 'htm', 'xml', 'yaml', 'yml', 'java', 'cpp', 'c', 'h', 'php', 'rb', 'go', 'rs', 'swift', 'kt', 'sql', 'sh', 'bat', 'ps1', 'r', 'm', 'scala', 'pl', 'lua', 'py'].includes(fileExtension || '');
-    const isImageFile = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif', 'webp', 'svg', 'ico', 'psd', 'ai', 'eps', 'raw', 'cr2', 'nef', 'arw'].includes(fileExtension || '');
-    const isBinaryFile = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp', 'odg', 'odf', 'epub', 'mobi', 'azw', 'azw3'].includes(fileExtension || '');
-    const isMediaFile = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a', 'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v'].includes(fileExtension || '');
-    const isArchiveFile = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz'].includes(fileExtension || '');
-    const isSpecialFile = ['ics', 'vcf', 'kml', 'gpx', 'dwg', 'dxf', 'step', 'stl'].includes(fileExtension || '');
+  // 读取文件内容（保留但不使用，因为直接发送原始文件到后端）
+  // const readFileContent = async (file: File): Promise<string> => {
+  //   const fileExtension = file.name.split('.').pop()?.toLowerCase();
+  //   const isTextFile = ['txt', 'md', 'rtf', 'tex', 'log', 'csv', 'tsv', 'json', 'js', 'ts', 'jsx', 'tsx', 'css', 'html', 'htm', 'xml', 'yaml', 'yml', 'java', 'cpp', 'c', 'h', 'php', 'rb', 'go', 'rs', 'swift', 'kt', 'sql', 'sh', 'bat', 'ps1', 'r', 'm', 'scala', 'pl', 'lua', 'py'].includes(fileExtension || '');
+  //   const isImageFile = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif', 'webp', 'svg', 'ico', 'psd', 'ai', 'eps', 'raw', 'cr2', 'nef', 'arw'].includes(fileExtension || '');
+  //   const isBinaryFile = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp', 'odg', 'odf', 'epub', 'mobi', 'azw', 'azw3'].includes(fileExtension || '');
+  //   const isMediaFile = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'wma', 'm4a', 'mp4', 'avi', 'mkv', 'mov', 'wmv', 'flv', 'webm', 'm4v'].includes(fileExtension || '');
+  //   const isArchiveFile = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz'].includes(fileExtension || '');
+  //   const isSpecialFile = ['ics', 'vcf', 'kml', 'gpx', 'dwg', 'dxf', 'step', 'stl'].includes(fileExtension || '');
 
-    if (isTextFile) {
-      try {
-        const content = await file.text();
-        if (content.trim()) {
-          return `这是一个${fileExtension?.toUpperCase()}文件，文件内容：\n${content.slice(0, 2000)}${content.length > 2000 ? '...(内容已截断)' : ''}`;
-        }
-      } catch (error) {
-        console.warn('读取文本文件失败:', error);
-      }
-    }
+  //   if (isTextFile) {
+  //     try {
+  //       const content = await file.text();
+  //       if (content.trim()) {
+  //         return `这是一个${fileExtension?.toUpperCase()}文件，文件内容：\n${content.slice(0, 2000)}${content.length > 2000 ? '...(内容已截断)' : ''}`;
+  //       }
+  //     } catch (error) {
+  //       console.warn('读取文本文件失败:', error);
+  //     }
+  //   }
 
-    // 为图片和二进制文件提供详细的元数据信息
-    const fileInfo = {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      lastModified: new Date(file.lastModified).toLocaleString('zh-CN'),
-      extension: fileExtension?.toUpperCase() || '未知'
-    };
+  //   // 为图片和二进制文件提供详细的元数据信息
+  //   const fileInfo = {
+  //     name: file.name,
+  //     size: file.size,
+  //     type: file.type,
+  //     lastModified: new Date(file.lastModified).toLocaleString('zh-CN'),
+  //     extension: fileExtension?.toUpperCase() || '未知'
+  //   };
 
-    if (isImageFile) {
-      return `这是一个图片文件，详细信息：\n` +
-             `- 原始文件名：${fileInfo.name}\n` +
-             `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
-             `- 图片格式：${fileInfo.extension}\n` +
-             `- 最后修改时间：${fileInfo.lastModified}\n` +
-             `请根据文件名模式、拍摄时间等信息推断图片的用途和内容。`;
-    }
+  //   if (isImageFile) {
+  //     return `这是一个图片文件，详细信息：\n` +
+  //            `- 原始文件名：${fileInfo.name}\n` +
+  //            `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
+  //            `- 图片格式：${fileInfo.extension}\n` +
+  //            `- 最后修改时间：${fileInfo.lastModified}\n` +
+  //            `请根据文件名模式、拍摄时间等信息推断图片的用途和内容。`;
+  //   }
 
-    if (isBinaryFile) {
-      return `这是一个${fileInfo.extension}文档，详细信息：\n` +
-             `- 原始文件名：${fileInfo.name}\n` +
-             `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
-             `- 文档类型：${fileInfo.extension}\n` +
-             `- 最后修改时间：${fileInfo.lastModified}\n` +
-             `请根据文件名、大小、修改时间等信息推断文档的内容和用途。`;
-    }
+  //   if (isBinaryFile) {
+  //     return `这是一个${fileInfo.extension}文档，详细信息：\n` +
+  //            `- 原始文件名：${fileInfo.name}\n` +
+  //            `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
+  //            `- 文档类型：${fileInfo.extension}\n` +
+  //            `- 最后修改时间：${fileInfo.lastModified}\n` +
+  //            `请根据文件名、大小、修改时间等信息推断文档的内容和用途。`;
+  //   }
 
-    if (isMediaFile) {
-      return `这是一个${fileInfo.extension}媒体文件，详细信息：\n` +
-             `- 原始文件名：${fileInfo.name}\n` +
-             `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
-             `- 媒体类型：${fileInfo.extension}\n` +
-             `- 最后修改时间：${fileInfo.lastModified}\n` +
-             `请根据文件名、时间等信息推断媒体文件的用途和内容。`;
-    }
+  //   if (isMediaFile) {
+  //     return `这是一个${fileInfo.extension}媒体文件，详细信息：\n` +
+  //            `- 原始文件名：${fileInfo.name}\n` +
+  //            `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
+  //            `- 媒体类型：${fileInfo.extension}\n` +
+  //            `- 最后修改时间：${fileInfo.lastModified}\n` +
+  //            `请根据文件名、时间等信息推断媒体文件的用途和内容。`;
+  //   }
 
-    if (isArchiveFile) {
-      return `这是一个${fileInfo.extension}压缩文件，详细信息：\n` +
-             `- 原始文件名：${fileInfo.name}\n` +
-             `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
-             `- 压缩格式：${fileInfo.extension}\n` +
-             `- 最后修改时间：${fileInfo.lastModified}\n` +
-             `请根据文件名等信息推断压缩包的用途和可能包含的内容。`;
-    }
+  //   if (isArchiveFile) {
+  //     return `这是一个${fileInfo.extension}压缩文件，详细信息：\n` +
+  //            `- 原始文件名：${fileInfo.name}\n` +
+  //            `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
+  //            `- 压缩格式：${fileInfo.extension}\n` +
+  //            `- 最后修改时间：${fileInfo.lastModified}\n` +
+  //            `请根据文件名等信息推断压缩包的用途和可能包含的内容。`;
+  //   }
 
-    if (isSpecialFile) {
-      return `这是一个${fileInfo.extension}专业格式文件，详细信息：\n` +
-             `- 原始文件名：${fileInfo.name}\n` +
-             `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
-             `- 文件格式：${fileInfo.extension}\n` +
-             `- 最后修改时间：${fileInfo.lastModified}\n` +
-             `请根据文件名、格式等信息推断文件的专业用途和内容。`;
-    }
+  //   if (isSpecialFile) {
+  //     return `这是一个${fileInfo.extension}专业格式文件，详细信息：\n` +
+  //            `- 原始文件名：${fileInfo.name}\n` +
+  //            `- 文件大小：${(fileInfo.size / 1024 / 1024).toFixed(2)}MB\n` +
+  //            `- 文件格式：${fileInfo.extension}\n` +
+  //            `- 最后修改时间：${fileInfo.lastModified}\n` +
+  //            `请根据文件名、格式等信息推断文件的专业用途和内容。`;
+  //   }
 
-    // 其他文件类型
-    return `这是一个${fileInfo.extension}文件，详细信息：\n` +
-           `- 原始文件名：${fileInfo.name}\n` +
-           `- 文件大小：${(fileInfo.size / 1024).toFixed(2)}KB\n` +
-           `- 文件类型：${fileInfo.type || '未知'}\n` +
-           `- 最后修改时间：${fileInfo.lastModified}\n` +
-           `请根据可用信息推断文件的用途和内容。`;
-  };
+  //   // 其他文件类型
+  //   return `这是一个${fileInfo.extension}文件，详细信息：\n` +
+  //          `- 原始文件名：${fileInfo.name}\n` +
+  //          `- 文件大小：${(fileInfo.size / 1024).toFixed(2)}KB\n` +
+  //          `- 文件类型：${fileInfo.type || '未知'}\n` +
+  //          `- 最后修改时间：${fileInfo.lastModified}\n` +
+  //          `请根据可用信息推断文件的用途和内容。`;
+  // };
 
   // 调用后端 API - 直接发送原始文件
   const callDeepSeekAPI = async (file: File): Promise<string> => {
@@ -325,7 +325,7 @@ const ProcessPage: React.FC = () => {
   };
 
   // 处理单个文件
-  const processFile = async (fileItem: FileItem, index: number) => {
+  const processFile = async (fileItem: FileItem) => {
     try {
       setFiles(prev => prev.map(f => 
         f.id === fileItem.id ? { ...f, isProcessing: true } : f
@@ -395,7 +395,7 @@ const ProcessPage: React.FC = () => {
       
       if (!files[i].isProcessed) {
         setCurrentProcessingIndex(i);
-        await processFile(files[i], i);
+        await processFile(files[i]);
         
         // 在延迟期间也检查是否被暂停
         if (i < files.length - 1 && !shouldStopProcessing.current) {
@@ -425,7 +425,7 @@ const ProcessPage: React.FC = () => {
       
       return () => clearTimeout(timer);
     }
-  }, [files, location.state?.autoProcess, isProcessing]);
+  }, [files, location.state?.autoProcess, isProcessing, handleBatchProcess]);
 
   // 编辑功能
   const startEditing = (id: string) => {
@@ -489,18 +489,18 @@ const ProcessPage: React.FC = () => {
     const batchId = Math.random().toString(36).substr(2, 9);
     const timestamp = Date.now();
     
-    // 为每个文件创建单独的记录
-    const fileRecords = files.map(f => {
-      const extension = f.originalName.split('.').pop() || '';
-      return {
-        id: Math.random().toString(36).substr(2, 9),
-        timestamp,
-        originalName: f.originalName,
-        newName: f.editedName,
-        fileExtension: extension,
-        batchId
-      };
-    });
+    // 为每个文件创建单独的记录（保留但不使用）
+    // const fileRecords = files.map(f => {
+    //   const extension = f.originalName.split('.').pop() || '';
+    //   return {
+    //     id: Math.random().toString(36).substr(2, 9),
+    //     timestamp,
+    //     originalName: f.originalName,
+    //     newName: f.editedName,
+    //     fileExtension: extension,
+    //     batchId
+    //   };
+    // });
 
     // 创建兼容旧格式的历史记录项
     const legacyHistoryItem = {

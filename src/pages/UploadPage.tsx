@@ -12,7 +12,6 @@ export default function UploadPage() {
   const navigate = useNavigate();
   const [files, setFiles] = useState<FileItem[]>([]);
   const [dragActive, setDragActive] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
 
   // 支持的文件类型 - 与后端保持一致
   const supportedTypes = [
@@ -225,7 +224,7 @@ export default function UploadPage() {
               accept=".txt,.md,.doc,.docx,.xls,.xlsx,.py,.pdf,.ppt,.pptx,.png,.jpg,.jpeg,.gif,.rtf,.csv,.json,.xml,.html,.css,.js,.java,.cpp,.php,.go,.mp3,.mp4,.zip,.rar"
               onChange={handleFileInput}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              disabled={isUploading}
+
             />
           </div>
         </div>

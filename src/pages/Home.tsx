@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { Upload, FileText, Download, Edit3, Check, X } from 'lucide-react';
 
 interface FileItem {
@@ -29,10 +28,9 @@ export default function Home() {
     }
   }, []);
 
-  // 处理文件放置
+  // 处理拖拽放置
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
-    e.stopPropagation();
     setDragActive(false);
     
     const droppedFiles = Array.from(e.dataTransfer.files);
@@ -113,9 +111,9 @@ export default function Home() {
       setFiles(prev => [...prev, ...newFiles]);
       
       // 为每个文件调用AI API
-      for (const fileItem of newFiles) {
-        try {
-          const suggestedName = await generateFileName(fileItem.content, fileItem.originalName);
+        for (const fileItem of newFiles) {
+          try {
+            const suggestedName = await generateFileName();
           setFiles(prev => prev.map(f => 
             f.id === fileItem.id 
               ? { ...f, suggestedName, editedName: suggestedName, isProcessing: false }
@@ -256,8 +254,8 @@ export default function Home() {
   };
 
   // 🔒 安全提示：为了保护API密钥安全，此功能已禁用
-  // 请使用"处理文件"页面的安全功能进行文件重命名
-  const generateFileName = async (content: string, originalName: string): Promise<string> => {
+  // 请使用"处理文件"页面的安全功能进行文件重命名// 生成文件名
+  const generateFileName = async (): Promise<string> => {
     // 安全考虑：不在前端直接调用API，避免密钥暴露
     throw new Error('为了安全考虑，请使用"处理文件"页面进行文件重命名操作');
   };
