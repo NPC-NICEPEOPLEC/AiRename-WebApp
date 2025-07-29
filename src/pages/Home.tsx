@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { Upload, FileText, Download, Edit3, Check, X } from 'lucide-react';
 
 interface FileItem {
@@ -254,106 +255,11 @@ export default function Home() {
     }
   };
 
-  // 调用AI API生成文件名
+  // 🔒 安全提示：为了保护API密钥安全，此功能已禁用
+  // 请使用"处理文件"页面的安全功能进行文件重命名
   const generateFileName = async (content: string, originalName: string): Promise<string> => {
-    const apiKey = import.meta.env.VITE_DEEPSEEK_API_KEY;
-    const baseUrl = import.meta.env.VITE_DEEPSEEK_API_BASE_URL;
-    
-    if (!apiKey || !baseUrl) {
-      throw new Error('API配置缺失');
-    }
-
-    // 使用专业的文档理解与命名专家prompt
-    const systemPrompt = `# Role
-
-智能文档理解与命名专家
-
-## Profile
-
-* author: eureka
-* version: 2.1
-* description: 作为一名专注于语义理解与结构提炼的 AI 专家，负责阅读各类文档，精准提炼核心价值，生成逻辑清晰的概要与高度识别性的标题，以提升文档的可管理性与搜索效率。
-
-## Constraints
-
-* 必须完整覆盖文档中的关键信息与价值点，避免遗漏。
-* 文档标题必须高度凝练，具备唯一性、识别性与搜索友好性。
-* 概要内容应逻辑清晰、语义准确，不进行主观推断或夸大。
-* 严禁直接复制文档中的句子作为标题使用。
-* 所有输出必须使用正式书面语表达，避免口语化。
-
-## Response Format
-
-请严格使用以下格式返回：
-
-**文档概要**：
-<用 2~4 句描述文档核心内容>
-
-**文档标题**：
-<一句话标题，15 字以内>`;
-
-    const userPrompt = `请深入阅读以下文档内容，调用语言理解、结构建模与语义抽象等能力，识别其主题、重点信息及核心意图。以结构清晰、语言专业的方式，输出高质量的"文档概要"与"文档标题"。
-
-原文件名：${originalName}
-
-文档内容：
-${content.substring(0, 3000)}
-
-请按照指定格式返回文档概要和标题。`;
-
-    const response = await fetch(`${baseUrl}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          },
-          {
-            role: 'user',
-            content: userPrompt
-          }
-        ],
-        max_tokens: 300,
-        temperature: 0.7
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`API请求失败: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const aiResponse = data.choices?.[0]?.message?.content?.trim();
-    
-    if (!aiResponse) {
-      throw new Error('AI返回空结果');
-    }
-
-    // 提取文档标题
-    const titleMatch = aiResponse.match(/\*\*文档标题\*\*[：:](.*?)(?=\n|$)/s);
-    let suggestedName = titleMatch ? titleMatch[1].trim() : '';
-    
-    // 如果没有找到标题，尝试其他格式
-    if (!suggestedName) {
-      const lines = aiResponse.split('\n').filter(line => line.trim());
-      suggestedName = lines[lines.length - 1].trim();
-    }
-    
-    // 清理标题，移除特殊字符
-    suggestedName = suggestedName.replace(/[<>:"/\\|?*]/g, '').trim();
-    
-    if (!suggestedName || suggestedName.length < 2) {
-      // 如果AI生成失败，使用原文件名
-      suggestedName = originalName.replace(/\.[^/.]+$/, '');
-    }
-
-    return suggestedName;
+    // 安全考虑：不在前端直接调用API，避免密钥暴露
+    throw new Error('为了安全考虑，请使用"处理文件"页面进行文件重命名操作');
   };
 
   // 编辑文件名
@@ -453,6 +359,23 @@ ${content.substring(0, 3000)}
 
       {/* 主要内容 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* 安全提示 */}
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-start space-x-3">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-yellow-800">安全提示</h3>
+              <p className="mt-1 text-sm text-yellow-700">
+                为了保护API密钥安全，此页面的AI重命名功能已禁用。请使用"处理文件"页面进行安全的文件重命名操作。
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* 文件上传区域 */}
         <div className="mb-8">
           <div

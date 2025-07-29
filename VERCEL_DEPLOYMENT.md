@@ -35,13 +35,23 @@ git push origin main
 
 #### 必需的环境变量
 ```
+# 🔒 安全配置：仅后端使用API密钥
 DEEPSEEK_API_KEY=your_deepseek_api_key_here
-VITE_DEEPSEEK_API_KEY=your_deepseek_api_key_here
-VITE_DEEPSEEK_API_BASE_URL=https://api.deepseek.com
+
+# 🌐 前端配置：通过后端代理访问API
+VITE_BACKEND_API_URL=/api
+
+# ⚙️ 应用配置
 VITE_APP_NAME=AiRename
 VITE_MAX_FILE_SIZE=209715200
 VITE_MAX_FILES_COUNT=10
 ```
+
+#### ⚠️ 重要安全说明
+
+- **不要配置** `VITE_DEEPSEEK_API_KEY` 和 `VITE_DEEPSEEK_API_BASE_URL`
+- 这些变量会暴露在前端代码中，存在安全风险
+- 所有API调用都通过后端代理进行，确保密钥安全
 
 #### 获取 DeepSeek API 密钥
 1. **官方平台**（需要充值）：https://platform.deepseek.com/api_keys
