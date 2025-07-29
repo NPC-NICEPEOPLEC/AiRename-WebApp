@@ -298,7 +298,7 @@ const ProcessPage: React.FC = () => {
         fileSize: file.size
       });
 
-      const response = await fetch(`${backendUrl}/api/process-document/`, {
+      const response = await fetch(`${backendUrl}/process-document/`, {
         method: 'POST',
         body: formData
       });
